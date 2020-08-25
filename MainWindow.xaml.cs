@@ -81,6 +81,7 @@ namespace Prototype
         }
         void DisplayController()
         {
+            /*
             if (!Controller.Model.IsConnected) return;
             // just a test
             var state = Controller.Model.GetState();
@@ -88,22 +89,8 @@ namespace Prototype
             var last = lastState.Gamepad.Buttons;
             var now = state.Gamepad.Buttons;
 
-            CheckButton(b_a, GamepadButtonFlags.A, last,now);
-            CheckButton(b_b, GamepadButtonFlags.B, last, now);
-            CheckButton(b_x, GamepadButtonFlags.X, last, now);
-            CheckButton(b_y, GamepadButtonFlags.Y, last, now);
-            CheckButton(b_minus, GamepadButtonFlags.Back, last, now);
-            CheckButton(b_plus, GamepadButtonFlags.Start, last, now);
-            CheckButton(b_ls, GamepadButtonFlags.LeftThumb, last, now);
-            CheckButton(b_rs, GamepadButtonFlags.RightThumb, last, now);
-            CheckButton(b_dpad, (GamepadButtonFlags.DPadDown | GamepadButtonFlags.DPadUp | GamepadButtonFlags.DPadLeft | GamepadButtonFlags.DPadRight), last, now);
-
-            b_lt.Visibility = (state.Gamepad.LeftTrigger == 0) ? Visibility.Collapsed : Visibility.Visible;
-            b_rt.Visibility = (state.Gamepad.RightTrigger == 0) ? Visibility.Collapsed : Visibility.Visible;
-            b_home.Visibility = Visibility.Collapsed;
-            b_select.Visibility = Visibility.Collapsed;
-
             lastState = state;
+            */
         }
         const double DegreesToRadians = 0.01745329252;
 

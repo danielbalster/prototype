@@ -37,10 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
+      <HintPath>packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
+      <HintPath>packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -152,30 +152,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Images\" />
     <Folder Include="Meshes\" />
     <Folder Include="Pathfinding\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\switch.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\a.png" />
-    <Resource Include="Images\b.png" />
-    <Resource Include="Images\dpad.png" />
-    <Resource Include="Images\home.png" />
-    <Resource Include="Images\ls.png" />
-    <Resource Include="Images\lt.png" />
-    <Resource Include="Images\minus.png" />
-    <Resource Include="Images\plus.png" />
-    <Resource Include="Images\rs.png" />
-    <Resource Include="Images\rt.png" />
-    <Resource Include="Images\select.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\x.png" />
-    <Resource Include="Images\y.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
