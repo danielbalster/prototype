@@ -1,0 +1,176 @@
+﻿<Window x:Class="Prototype.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Prototype"
+        mc:Ignorable="d"
+        Title="Multi-Selection Prototype" Height="1000" Width="1132" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="487"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TabControl Grid.Column="0">
+                <TabItem Header="Units">
+                    <ContentControl Content="{Binding UnitsEditor}" ContentTemplate="{StaticResource unitsEditor}" />
+                </TabItem>
+                <TabItem Header="Behaviors">
+                    <ContentControl Content="{Binding BehaviortreesEditor}" ContentTemplate="{StaticResource behaviortreeEditor}" />
+                </TabItem>
+                <TabItem Header="Inputmappings">
+                </TabItem>
+            </TabControl>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.ColumnSpan="2" FontWeight="Bold">Selection Method</Label>
+                <RadioButton Grid.Row="1" x:Name="cb_crosshair" Grid.Column="0" Grid.ColumnSpan="2" Content="2D Crosshair" IsChecked="True"/>
+                <RadioButton Grid.Row="2" x:Name="cb_selectioncircle" Grid.Column="0" Grid.ColumnSpan="2" Content="Screenspace Circle" IsChecked="False"/>
+                <RadioButton Grid.Row="3" x:Name="cb_wscircle" Grid.Column="0" Grid.ColumnSpan="2" Content="Worldspace Circle" IsChecked="False"/>
+                <Label Grid.Row="4" >Size</Label>
+                <Slider Grid.Row="4" x:Name="sl_size" Grid.Column="1" Maximum="500" Minimum="1" Value="100" />
+                <Label Grid.Row="5" >Opacity</Label>
+                <Slider Grid.Row="5" x:Name="sl_crosshair" Grid.Column="1" Maximum="1" Minimum="-2" Value="0.5" />
+                <Separator Grid.Row="6" Grid.ColumnSpan="2"/>
+                <CheckBox Grid.Row="7" x:Name="cb_showbounds" Grid.Column="0" Grid.ColumnSpan="2" Content="Show 2D Bounds" IsChecked="True"/>
+
+                <Label Grid.Row="8" >Above Ground</Label>
+                <Slider Grid.Row="8" Grid.Column="1" Maximum="300" Minimum="0" Value="{Binding aboveGround}" />
+                <Label Grid.Row="9" >Camera Pitch</Label>
+                <Slider Grid.Row="9" Grid.Column="1" Maximum="0" Minimum="-360" Value="{Binding pitch}" />
+
+
+            </Grid>
+        </Grid>
+
+        <Canvas x:Name="topcanvas" Grid.Row="0" >
+            <Image Source="Images/switch.png" Width="1106" Stretch="Fill" />
+            <Image x:Name="b_lt" Visibility="Collapsed" Source="Images/lt.png" Canvas.Left="9" Canvas.Top="4" Width="163" Height="92" Stretch="Fill"/>
+            <Image x:Name="b_minus" Visibility="Collapsed" Source="Images/minus.png" Canvas.Left="141" Canvas.Top="52" Width="42" Height="29" Stretch="Fill"/>
+            <Image x:Name="b_a" Visibility="Collapsed" Source="Images/a.png" Canvas.Left="1017" Canvas.Top="125" Width="48" Height="46" Stretch="Fill"/>
+            <Image x:Name="b_b" Visibility="Collapsed" Source="Images/b.png" Canvas.Left="976" Canvas.Top="164" Width="47" Height="47" Stretch="Fill"/>
+            <Image x:Name="b_dpad" Visibility="Collapsed" Source="Images/dpad.png" Canvas.Left="54" Canvas.Top="233" Width="116" Height="120" Stretch="Fill"/>
+            <Image x:Name="b_home" Visibility="Collapsed" Source="Images/home.png" Canvas.Left="928" Canvas.Top="375" Width="52" Height="53" Stretch="Fill"/>
+            <Image x:Name="b_ls" Visibility="Collapsed" Source="Images/ls.png" Canvas.Left="63" Canvas.Top="101" Width="99" Height="97" Stretch="Fill"/>
+            <Image x:Name="b_plus" Visibility="Collapsed" Source="Images/plus.png" Canvas.Left="928" Canvas.Top="48" Width="41" Height="41" Stretch="Fill"/>
+            <Image x:Name="b_rs" Visibility="Collapsed" Source="Images/rs.png" Canvas.Left="950" Canvas.Top="242" Width="99" Height="101" Stretch="Fill"/>
+            <Image x:Name="b_rt" Visibility="Collapsed" Source="Images/rt.png" Canvas.Left="945" Canvas.Top="3" Width="150" Height="93" Stretch="Fill"/>
+            <Image x:Name="b_select" Visibility="Collapsed" Source="Images/select.png" Canvas.Left="135" Canvas.Top="378" Width="42" Height="45" Stretch="Fill"/>
+            <Image x:Name="b_x" Visibility="Collapsed" Source="Images/x.png" Canvas.Left="976" Canvas.Top="86" Width="48" Height="49" Stretch="Fill"/>
+            <Image x:Name="b_y" Visibility="Collapsed" Source="Images/y.png" Canvas.Left="936" Canvas.Top="123" Width="46" Height="50" Stretch="Fill"/>
+            <Grid x:Name="scene"  ClipToBounds="True" Canvas.Left="236" Canvas.Top="65" Width="640" Height="364">
+                <Viewport3D x:Name="Viewport" ClipToBounds="True">
+                    <Viewport3D.Camera>
+                        <PerspectiveCamera  x:Name="Camera"
+                                            Position="0 10 10"
+                                            LookDirection="0 -0.3 -1"
+                                            UpDirection="0, 1, 0"
+                                            FieldOfView="90"/>
+                    </Viewport3D.Camera>
+                    <Viewport3D.Children>
+
+                        <ModelVisual3D>
+                            <ModelVisual3D.Content>
+                                <Model3DGroup x:Name="gizmos">
+                                    <DirectionalLight Color="#FFFFFF" Direction="0 -1 0" />
+                                    <AmbientLight Color = "#999999" />
+                                </Model3DGroup>
+                            </ModelVisual3D.Content>
+                        </ModelVisual3D>
+
+                        <ModelVisual3D x:Name="Models">
+                        </ModelVisual3D>
+                    </Viewport3D.Children>
+                </Viewport3D>
+            </Grid>
+            <Canvas x:Name="wireframe"  ClipToBounds="True" Canvas.Left="236" Canvas.Top="65" Width="640" Height="364">
+            </Canvas>
+            <Grid x:Name="crosshair" Canvas.Left="556" Canvas.Top="247"
+                  Opacity="{Binding ElementName=sl_crosshair, Path=Value}"
+                  >
+                <Polyline
+                    Points="-50,0 50,0 "
+                    Stroke="Black"
+                    StrokeThickness="1" 
+                    />
+                <Polyline
+                    Points="0,-50 0,50 "
+                    Stroke="Black"
+                    StrokeThickness="1"
+                    />
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsChecked,ElementName=cb_crosshair}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+            </Grid>
+            <Grid Canvas.Left="236" Canvas.Top="65" Width="640" Height="364"
+                  Opacity="{Binding ElementName=sl_crosshair, Path=Value}"
+                  >
+                <Ellipse x:Name="selectioncircle" 
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="{Binding ElementName=sl_size, Path=Value}"
+                         Height="{Binding ElementName=sl_size, Path=Value}"
+                     Stroke="Black" StrokeThickness="0.5"/>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsChecked,ElementName=cb_selectioncircle}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+            </Grid>
+            <TextBlock DataContext="{Binding Controller}" FontWeight="Bold" FontSize="18" Canvas.Left="428" Canvas.Top="233">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Red" />
+                        <Setter Property="Text" Value="CONTROLLER NOT CONNECTED!" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+        </Canvas>
+
+
+
+    </Grid>
+</Window>

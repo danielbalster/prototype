@@ -1,0 +1,34 @@
+﻿<ResourceDictionary
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Prototype"
+        mc:Ignorable="d">
+
+    <DataTemplate x:Key="behaviortreeEditor" DataType="{x:Type local:BehaviortreesEditorViewModel}">
+        <DockPanel>
+            <ToolBar DockPanel.Dock="Top">
+                <Button Content="New"/>
+                <Button Content="Cut"/>
+                <Button Content="Copy"/>
+                <Button Content="Paste"/>
+            </ToolBar>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+            <!-- list of behaviors -->
+            <ListBox Grid.Column="0">
+                
+            </ListBox>
+            <!-- editor of selected behavior -->
+            <ListBox Grid.Column="1">
+
+            </ListBox>
+        </DockPanel>
+    </DataTemplate>
+
+</ResourceDictionary>

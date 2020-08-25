@@ -1,0 +1,61 @@
+﻿<ResourceDictionary
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:Prototype"
+        mc:Ignorable="d">
+    
+    <ObjectDataProvider x:Key="unitTypesEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="local:UnitTypes"/>
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+
+    <DataTemplate x:Key="unitsEditor" DataType="{x:Type local:UnitsEditorViewModel}">
+        <DockPanel>
+            <ToolBar DockPanel.Dock="Top">
+                <Button Content="New Unit" Height="20" Command="{Binding AddSingle}"/>
+                <Button Content="+100 Random" Height="20" Command="{Binding AddRandom}"/>
+                <Button Content="+100 Uniform" Height="20" Command="{Binding AddUniform}"/>
+
+                <ComboBox ItemsSource="{Binding Source={StaticResource unitTypesEnum}}"
+                                SelectedItem="{Binding Path=UnitType, Mode=TwoWay}" />
+
+
+                <Separator/>
+                <Button Content="Remove All" Height="20"  Command="{Binding ClearUnits}"/>
+                <Button Content="Remove Selected" Height="20"   Command="{Binding RemoveSelected}" />
+                <Separator/>
+                <Button Content="Select All" Height="20"   Command="{Binding SelectAll}" />
+                <Button Content="Select None" Height="20"   Command="{Binding SelectNone}" />
+            </ToolBar>
+            <ListBox ItemsSource="{Binding Units}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding Selected, Mode=TwoWay}"/>
+                            <TextBlock Grid.Column="1">X:</TextBlock>
+                            <TextBox Grid.Column="2" Text="{Binding X,Mode=TwoWay}"/>
+                            <TextBlock Grid.Column="3">Y:</TextBlock>
+                            <TextBox Grid.Column="4" Text="{Binding Y,Mode=TwoWay}"/>
+                            <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource unitTypesEnum}}"
+                                SelectedItem="{Binding Path=Type, Mode=TwoWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </DockPanel>
+    </DataTemplate>
+
+</ResourceDictionary>
