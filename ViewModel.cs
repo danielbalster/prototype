@@ -3,9 +3,8 @@ using System.ComponentModel;
 
 namespace Prototype
 {
-    public class ViewModelBase<T> : INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged
     {
-        public T Model { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void RaisePropertyChanged(String info)
@@ -16,4 +15,10 @@ namespace Prototype
             }
         }
     }
+
+    public class ViewModelBase<T> : ViewModel
+    {
+        public T Model { get; set; }
+    }
+
 }

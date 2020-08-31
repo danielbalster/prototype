@@ -9,23 +9,25 @@ using System.Windows;
 namespace Prototype
 {
     [Node]
-    class FindTarget : Node
+    public class FindTarget : Node
     {
         Random rng = new Random();
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
-            var p = new Vector(rng.Next(-100, +100), rng.Next(-100, +100));
-            Blackboard.Set(sender, Guid.Empty, "target", p);
+            if (!bb.Get(Guid.Empty, "unit", out Unit unit)) return Status.Error;
+            var r = Helper.DegreesToRadians * rng.Next(0, 360);
+            var p = new Vector(Math.Sin(r)*10,Math.Cos(r)*10);
+            bb.Set( Guid.Empty, "target", unit.Position + p);
             return Status.Success;
         }
     }
 
     [Node]
-    class HasTarget : Node
+    public class HasTarget : Node
     {
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
-            if (Blackboard.Get(sender, Guid.Empty, "target", out object value))
+            if (bb.Get( Guid.Empty, "target", out Vector value))
             {
                 return Status.Success;
             }
@@ -34,48 +36,67 @@ namespace Prototype
     }
 
     [Node]
-    class MoveTo : Node
+    public class MoveTo : Node
     {
-        protected override void OnOpen(object sender)
+        protected override void OnOpen(Blackboard bb)
         {
-            var unit = sender as Unit;
-            if (unit == null) return;
+            if (!bb.Get(Guid.Empty, "unit", out Unit unit)) return;
+            if (!bb.Get( Guid.Empty, "target", out Vector target)) return;
 
-            if (!Blackboard.Get(sender, Guid.Empty, "target", out object target)) return;
-
-
-            var delta = (Vector)target- unit.Position;
+            var delta = target- unit.Position;
             delta.Normalize();
 
-            Blackboard.Set(sender, Id, "step", delta * 0.1);
+            bb.Set( Id, "step", delta * 0.1);
         }
 
-        protected override void OnClose(object sender)
+        protected override void OnClose(Blackboard bb)
         {
-            Blackboard.Clear(sender, Id, "step");
-            Blackboard.Clear(sender, Guid.Empty, "target");
+            bb.Clear( Id, "step");
+            bb.Clear( Guid.Empty, "target");
         }
 
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
-            var unit = sender as Unit;
-            if (unit == null) return Status.Error;
+            if (!bb.Get( Guid.Empty, "unit", out Unit unit)) return Status.Error;
+            if (!bb.Get( Guid.Empty, "target", out Vector target)) return Status.Error;
 
-            if (!Blackboard.Get(sender, Guid.Empty, "target", out object target)) return Status.Error;
+            if (!bb.Get( Id, "step", out Vector step)) return Status.Error;
 
-            if (!Blackboard.Get(sender, Id, "step", out object step)) return Status.Error;
-
-            unit.Position += (Vector)step;
-            var diff = unit.Position - (Vector)target;
+            unit.Position += step;
+            var diff = unit.Position - target;
             if (diff.Length > 1.0)
             { 
                 return Status.Running;
             }
 
-            unit.Position = (Vector)target;
+            unit.Position = target;
 
             return Status.Success;
         }
     }
 
+
+    [Node]
+    class HasSelection : Node
+    {
+
+    }
+
+    [Node]
+    class SelectUnits : Node
+    {
+
+    }
+
+    [Node]
+    class UnselectUnits : Node
+    {
+
+    }
+
+    [Node]
+    class RemoveSelected : Node
+    {
+
+    }
 }

@@ -16,34 +16,65 @@ namespace Prototype
         {
             Model = model;
 
-            modelVisual3D = new ModelVisual3D();
-            var geometryModel = new GeometryModel3D();
-            modelVisual3D.Content = geometryModel;
-            geometryModel.Geometry = Helper.FindResource("cubeMesh") as Geometry3D;
-            geometryModel.Material = Helper.FindResource("normalMaterial") as Material;
-            //geometryModel.Transform = new TranslateTransform3D(model.Position.X, 0, model.Position.Y);
-
+            modelVisual3D.Model = geometryModel3D;
+            modelVisual3D.MouseDown += OnMouseDown;
+            modelVisual3D.MouseUp += OnMouseUp;
+            geometryModel3D.Geometry = Helper.FindResource("cubeMesh") as Geometry3D;
+            geometryModel3D.Material = Helper.FindResource("normalMaterial") as Material;
             behaviortree = new BehaviortreeViewModel(Model.Behavior);
-
+            blackboard = new BlackboardViewModel(Model.Blackboard);
         }
 
-        public GeometryModel3D GeometryModel3D
+        BlackboardViewModel blackboard;
+        public BlackboardViewModel Blackboard
         {
-            get
+            get => blackboard;
+            set
             {
-                return modelVisual3D.Content as GeometryModel3D;
+                if (value != blackboard)
+                {
+                    blackboard = value;
+                    RaisePropertyChanged("Blackboard");
+                }
             }
         }
 
-        #region Position
-        private ModelVisual3D modelVisual3D;
-        public ModelVisual3D ModelVisual3D
+        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+        }
+
+        private void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                Model.World.PendingActions.Add((world) => {
+                    world.Units.Remove(Model);
+                });
+            }
+        }
+
+        #region ModelVisual3D
+        public ModelUIElement3D ModelVisual3D
         {
             get
             {
                 return modelVisual3D;
             }
         }
+        ModelUIElement3D modelVisual3D = new ModelUIElement3D();
+        #endregion
+
+        #region GeometryModel3D
+        public GeometryModel3D GeometryModel3D
+        {
+            get
+            {
+                return geometryModel3D;
+            }
+        }
+        private GeometryModel3D geometryModel3D = new GeometryModel3D();
         #endregion
 
         public UnitTypes Type
@@ -76,6 +107,11 @@ namespace Prototype
                     RaisePropertyChanged("Selected");
                 }
             }
+        }
+
+        public Guid Id
+        {
+            get => Model.Id;
         }
 
         BehaviortreeViewModel behaviortree;
@@ -147,10 +183,5 @@ namespace Prototype
             }
         }
         #endregion
-
-
-
-        // horrible hack: since WPF's Media3D supports no binding, whole MVVM is not usable.
-        // instead, the viewmodel will hold the 3D object and modifies it directly.
     }
 }

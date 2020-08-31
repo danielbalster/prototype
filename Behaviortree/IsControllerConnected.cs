@@ -8,7 +8,7 @@ namespace Prototype.Behaviortree
 {
     class IsControllerConnected : Node
     {
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
             return //Player.Instance.Controller.IsConnected ? Status.Success :
             Status.Failure;

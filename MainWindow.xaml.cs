@@ -22,6 +22,12 @@ using SharpDX.XInput;
 
 namespace Prototype
 {
+    public enum HitTestModes
+    {
+        Full,
+        Center,
+        Partial
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -39,13 +45,53 @@ namespace Prototype
             World = new WorldViewModel(world);
             UnitsEditor = new UnitsEditorViewModel(world);
             BehaviortreesEditor = new BehaviortreesEditorViewModel(world);
+            Camera = new CameraViewModel { Model = camera };
+            Camera.AspectRatio = Viewport.ActualWidth / Viewport.ActualHeight;
 
             world.Init();
             DataContext = this;
 
             SetupRender();
 
+            Viewport.MouseUp += Viewport_MouseUp;
+
             CompositionTarget.Rendering += OnRender;
+        }
+
+        public HitTestResultBehavior HTResult(System.Windows.Media.HitTestResult rawresult)
+        {
+            RayHitTestResult rayResult = rawresult as RayHitTestResult;
+            if (rayResult == null) return HitTestResultBehavior.Continue;
+            RayMeshGeometry3DHitTestResult rayMeshResult = rayResult as RayMeshGeometry3DHitTestResult;
+            if (rayMeshResult == null) return HitTestResultBehavior.Continue;
+            GeometryModel3D hitgeo = rayMeshResult.ModelHit as GeometryModel3D;
+
+            if (!(hitgeo == planeOdd || hitgeo == planeEven)) return HitTestResultBehavior.Continue;
+
+            var unit = new Unit { World = World.Model };
+            unit.Position = new Vector(rayResult.PointHit.X, rayResult.PointHit.Z); ;
+            unit.Selected = false;
+            unit.Type = UnitTypes.Leader;
+            unit.Behavior = null;
+
+            World.Model.PendingActions.Add((world) => {
+                world.Units.Add(unit);
+
+            });
+
+
+            return HitTestResultBehavior.Stop;
+        }
+
+        private void Viewport_MouseUp(object sender, MouseButtonEventArgs args)
+        {
+            var viewport = sender as Viewport3D;
+            var mouseposition = args.GetPosition(viewport);
+            var testpoint3D = new Point3D(mouseposition.X, mouseposition.Y, 0);
+            var testdirection = new Vector3D(mouseposition.X, mouseposition.Y, 10);
+            var pointparams = new PointHitTestParameters(mouseposition);
+            var rayparams = new RayHitTestParameters(testpoint3D, testdirection);
+            VisualTreeHelper.HitTest(viewport, null, HTResult, pointparams);
         }
 
         World world = new World();
@@ -71,7 +117,10 @@ namespace Prototype
             set;
         }
 
-        State lastState;
+        public HitTestModes HitTestMode { get; set; }
+
+        public CameraViewModel Camera { get; set; }
+
         void CheckButton(Image image, GamepadButtonFlags bits, GamepadButtonFlags last, GamepadButtonFlags now)
         {
             if ((bits & last) != (bits & now))
@@ -81,36 +130,11 @@ namespace Prototype
         }
         void DisplayController()
         {
-            /*
-            if (!Controller.Model.IsConnected) return;
-            // just a test
-            var state = Controller.Model.GetState();
 
-            var last = lastState.Gamepad.Buttons;
-            var now = state.Gamepad.Buttons;
-
-            lastState = state;
-            */
         }
-        const double DegreesToRadians = 0.01745329252;
-
-        Matrix3D GetProjectionMatrix(double aspectRatio)
-        {
-            double hFoV = DegreesToRadians * Camera.FieldOfView;
-            double zn = Camera.NearPlaneDistance;
-            double zf = Camera.FarPlaneDistance;
-            double xScale = 1 / Math.Tan(hFoV / 2);
-            double yScale = aspectRatio * xScale;
-            double m33 = (zf == double.PositiveInfinity) ? -1 : (zf / (zn - zf));
-            double m43 = zn * m33;
-            return new Matrix3D(
-                xScale, 0, 0, 0,
-                     0, yScale, 0, 0,
-                     0, 0, m33, -1,
-                     0, 0, m43, 0);
-        }
-
-        Material selected = new DiffuseMaterial { Brush = Brushes.Orange };
+ 
+        Material selectionmaterial = new DiffuseMaterial { Brush = Brushes.Orange };
+        Material highlightmaterial = new DiffuseMaterial { Brush = Brushes.LavenderBlush };
         Dictionary<UnitTypes, Material> materials = new Dictionary<UnitTypes, Material>();
 
         private void SetupRender()
@@ -122,34 +146,50 @@ namespace Prototype
             materials[UnitTypes.Military] = new DiffuseMaterial { Brush = Brushes.Yellow };
             materials[UnitTypes.Worker] = new DiffuseMaterial { Brush = Brushes.Magenta };
 
-            var odd = new GeometryModel3D();
-            odd.Geometry = MeshFactory.CreateCheckerboard(10, 50, 0);
-            odd.Material = new DiffuseMaterial { Brush = Brushes.LightCyan };
-            gizmos.Children.Add(odd);
-            var even = new GeometryModel3D();
-            even.Geometry = MeshFactory.CreateCheckerboard(10, 50, 1);
-            even.Material = new DiffuseMaterial { Brush = Brushes.LightBlue };
-            gizmos.Children.Add(even);
+            planeOdd = new GeometryModel3D();
+            planeOdd.Geometry = MeshFactory.CreateCheckerboard(5, 500, 0);
+            planeOdd.Material = new DiffuseMaterial { Brush = Brushes.LightCyan };
+            gizmos.Children.Add(planeOdd);
+            planeEven = new GeometryModel3D();
+            planeEven.Geometry = MeshFactory.CreateCheckerboard(5, 500, 1);
+            planeEven.Material = new DiffuseMaterial { Brush = Brushes.LightBlue };
+            gizmos.Children.Add(planeEven);
+
+            var cyl = new GeometryModel3D();
+            cyl.Geometry = MeshFactory.CreateCylinder(1, 1, 36);
+            var blk = new SolidColorBrush(Colors.Black);
+            blk.Opacity = 0.2;
+            cyl.Material = cyl.BackMaterial = new DiffuseMaterial { Brush = blk };
+            selectionCylinder = new ModelVisual3D { Content = cyl };
         }
+        ModelVisual3D selectionCylinder;
+        GeometryModel3D planeOdd;
+        GeometryModel3D planeEven;
 
         private void OnRender(object sender, EventArgs e)
         {
             Controller.Update();
-            DisplayController();
+
+            if (Controller.IsConnected)
+            {
+                var state = Controller.Model.GetState();
+                Camera.Update(state);
+                World.Model.CameraPosition = Camera.Position;
+            }
+
             World.Update();
-            UpdateCamera();
 
             wireframe.Children.Clear();
             Models.Children.Clear();
-
             var crosshair = new Point(wireframe.ActualWidth/2, wireframe.ActualHeight/2);
 
+            World.HighlightedUnits.Clear();
             foreach (var uvm in UnitsEditor.Units)
             {
                 uvm.ModelVisual3D.Transform = new TranslateTransform3D(uvm.X, 0, uvm.Y);
-                uvm.GeometryModel3D.Material = uvm.Selected ? selected : materials[uvm.Type];
                 Models.Children.Add(uvm.ModelVisual3D);
 
+                var selected = false;
                 GeneralTransform3DTo2D transform = uvm.ModelVisual3D.TransformToAncestor(Viewport);
                 if (transform != null)
                 {
@@ -158,14 +198,44 @@ namespace Prototype
                     {
                         if (cb_crosshair.IsChecked.Value)
                         {
-                            uvm.Selected = (bounds.Contains(crosshair));
+                            selected = (bounds.Contains(crosshair));
                         }
                         if (cb_selectioncircle.IsChecked.Value)
                         {
-                            uvm.Selected = TouchesCircle(bounds, crosshair, sl_size.Value/2);
+                            switch(HitTestMode)
+                            {
+                                case HitTestModes.Full:
+                                    selected = Helper.InsideCircle(bounds, crosshair, sl_size.Value / 2);
+                                    break;
+                                case HitTestModes.Center:
+                                    var center = new Point(bounds.Left + bounds.Width / 2, bounds.Top+bounds.Height / 2);
+                                    selected = (center - crosshair).Length < (sl_size.Value / 2);
+                                    break;
+                                case HitTestModes.Partial:
+                                    selected = Helper.TouchesCircle(bounds, crosshair, sl_size.Value / 2);
+                                    break;
+                            }
+                        }
+                        if (cb_wscircle.IsChecked.Value)
+                        {
+                            var agentRadius = 1;
+                            var extend = 0;
+                            switch (HitTestMode)
+                            {
+                                case HitTestModes.Full:
+                                    extend = +agentRadius;
+                                    break;
+                                case HitTestModes.Center:
+                                    break;
+                                case HitTestModes.Partial:
+                                    extend = -agentRadius;
+                                    break;
+                            }
+
+                            selected = ((uvm.Position - Camera.Position).Length+extend) < (sl_size.Value/20);
                         }
 
-                        if(cb_showbounds.IsChecked.Value)
+                        if (cb_showbounds.IsChecked.Value)
                         {
                             var p = new Rectangle
                             {
@@ -180,63 +250,24 @@ namespace Prototype
                         }
                     }
                 }
+
+                uvm.GeometryModel3D.Material = uvm.Selected ? selectionmaterial : materials[uvm.Type];
+                if (selected)
+                {
+                    uvm.GeometryModel3D.Material = highlightmaterial;
+                    World.HighlightedUnits.Add(uvm);
+                }
+
             }
-        }
 
-        // is any of the four ``bounds´´ corners in the circle around crosshair with radius?
-        private bool TouchesCircle(Rect bounds, Point crosshair, double radius)
-        {
-            return (((bounds.BottomLeft - crosshair).Length < radius) ||
-                ((bounds.BottomRight - crosshair).Length < radius) ||
-                ((bounds.TopLeft - crosshair).Length < radius) ||
-                ((bounds.TopRight - crosshair).Length < radius));
-        }
-
-        private bool InsideCircle(Rect bounds, Point crosshair, double radius)
-        {
-            return (((bounds.BottomLeft - crosshair).Length < radius) &&
-                ((bounds.BottomRight - crosshair).Length < radius) &&
-                ((bounds.TopLeft - crosshair).Length < radius) &&
-                ((bounds.TopRight - crosshair).Length < radius));
-        }
-
-        void OnTimerTick(object sender, EventArgs e)
-        {
-        }
-
-        Vector position = new Vector(0,-1);
-        public float aboveGround { get; set; } = 20;
-        public float pitch { get; set; } = -60;
-        float orientation = 0.0f;
-
-        private void UpdateCamera()
-        {
-            if (!Controller.Model.IsConnected) return;
-            var state = Controller.Model.GetState();
-            int x = state.Gamepad.RightThumbX / 16384;
-            int y = state.Gamepad.RightThumbY / 16384;
-
-            if (state.Gamepad.LeftTrigger > 0)
+            // the 1/20 scale of the sl_size value is purely cosmetic, no reason behind it.
+            if (cb_wscircle.IsChecked.Value)
             {
-                orientation += 3.0f;
-                if (orientation < 0.0f) orientation += 360.0f;
+                var trans = new TranslateTransform3D(Camera.Position.X, 0, Camera.Position.Y);
+                var scale = new ScaleTransform3D(new Vector3D(sl_size.Value / 20, 1, sl_size.Value / 20));
+                selectionCylinder.Transform = new Transform3DGroup { Children = { scale, trans } };
+                Models.Children.Add(selectionCylinder);
             }
-            if (state.Gamepad.RightTrigger > 0)
-            {
-                orientation -= 3.0f;
-                if (orientation > 360.0f) orientation -= 360.0f;
-            }
-
-            double rad = orientation * DegreesToRadians;
-            double sin = Math.Sin(rad);
-            double cos = Math.Cos(rad);
-            float fx = -y;
-            float fy = x;
-
-            position -= new Vector(fx * sin + fy * cos, fx * cos - fy * sin);
-
-            Camera.LookDirection = new Vector3D(Math.Sin(rad), pitch* DegreesToRadians , Math.Cos(rad));
-            Camera.Position = new Point3D(position.X, aboveGround, position.Y);
         }
 
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -251,6 +282,12 @@ namespace Prototype
             uvm.Model.Behavior.Root = root[0];
             root.Clear();
             dlg.Behavior = null;
+        }
+
+        private void Border_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (Camera != null)
+                Camera.AspectRatio = Viewport.ActualWidth / Viewport.ActualHeight;
         }
     }
 }

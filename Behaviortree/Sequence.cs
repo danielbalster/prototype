@@ -9,29 +9,29 @@ namespace Prototype.Behaviortree
     // success = all have succeeded
 
     [Node]
-    class Sequence : Composite
+    public class Sequence : Composite
     {
-        protected override void OnOpen(object sender)
+        protected override void OnOpen(Blackboard bb)
         {
-            Blackboard.Set(sender, Id, "i", 0);
+            bb.Set(Id, "#", 0);
         }
 
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
             int start = 0;
-            if (Blackboard.Get(sender, Id, "i", out object iter))
+            if (bb.Get(Id, "#", out object iter))
             {
                 start = (int)iter;
             }
 
             for (int i = start; i < Count; ++i)
             {
-                var status = this[i].Execute(sender);
+                var status = this[i].Execute(bb);
                 if (status != Status.Success)
                 {
                     if (status == Status.Running)
                     {
-                        Blackboard.Set(sender, Id, "i", i);
+                        bb.Set(Id, "#", i);
                     }
                     return status;
                 }

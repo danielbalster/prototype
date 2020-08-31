@@ -4,30 +4,51 @@
 
 This provides a small framework to prototype ideas, especially regardings multi-selection in RTS games.
 
-## ideas
+## todo
 
-- game grid model
-- path finder
-- behavior trees
-- game controller interface
-- list of units to simulate
-- game grid view model is a canvas that displays the itemsource
-- game grid needs to be scrollable
-- game grid needs to be rotatable
+[_] cylindrical mesh for ws selection with half-transparent material
+[_] mouse click into world hittest (floor, object)
+  - for debugging only. this is still a PC app
+[_] input behavior tree?
+  - conditions
+      get button
+	  get axis
+	  get selection empty?
+	  get selection count
+  - actions
+    - set variable
+	- increase variable
+	- set behavior to selected units
+	- 
 
+select group
+- hold A to add units
+- hold B to remove units
 
-list of behaviors
-list of units
-units have a behavior
-world has a grid
-grid supports
-- allocation/blocking
-- A* searches
+give command
+- press Y to choose command
 
-rendering
-- camera by matrix
-- locator of camera
-- looks to the grid
+move controller
+- target under crosshair
+- press A to confirm target
+- press B to cancel
 
-2D / 3D
-- get 
+BehaviortreeViewModel has a root NodeViewModel
+- have a template selector
+- fill an items control
+- sequence is vertical
+- selector is horizontal
+- decorator sits on top of a child
+
+decorator (add remove clear)
+child
+
+selector (add remove clear)
+A B C
+
+sequence
+A
+B
+C
+
+child (add before, add after, add parent)

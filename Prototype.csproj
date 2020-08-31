@@ -62,6 +62,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AttachedBehaviors.cs" />
+    <Compile Include="BlackboardViewModel.cs" />
+    <Compile Include="DragDropBehavior.cs" />
+    <Compile Include="NodeTemplateSelector.cs" />
+    <Compile Include="NodeViewModel.cs" />
     <Compile Include="BehaviortreeViewModel.cs" />
     <Compile Include="Behaviortree\BehaviorAttribute.cs" />
     <Compile Include="Behaviortree\Behaviortree.cs" />
@@ -80,17 +85,23 @@
     <Compile Include="Behaviortree\Selector.cs" />
     <Compile Include="Behaviortree\Sequence.cs" />
     <Compile Include="Behaviortree\Status.cs" />
-    <Compile Include="CheckerboardGrid.cs" />
+    <Compile Include="CameraViewModel.cs" />
+    <Compile Include="MeshFactory.cs" />
     <Compile Include="ControllerViewModel.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="MyGeometryModel3D.cs" />
     <Compile Include="PathQuery.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="Selection.cs" />
+    <Compile Include="TreeHelper.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="BehaviortreesEditorViewModel.cs" />
+    <Compile Include="UnitAction.cs" />
     <Compile Include="UnitBehaviortreeNodes.cs" />
     <Compile Include="UnitsEditorViewModel.cs" />
     <Compile Include="UnitViewModel.cs" />
     <Compile Include="ViewModel.cs" />
+    <Compile Include="ViewModelFactory.cs" />
     <Compile Include="World.cs" />
     <Compile Include="WorldViewModel.cs" />
     <Page Include="BehaviortreeEditor.xaml">
@@ -152,9 +163,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\" />
+    <Folder Include="External\" />
     <Folder Include="Meshes\" />
     <Folder Include="Pathfinding\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\down.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,7 +11,7 @@ namespace Prototype.Behaviortree
     {
         //public SharpDX.XInput.GamepadButtonFlags Buttons;
 
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
             /*
             if (!Player.Instance.Controller.GetState(out State state))

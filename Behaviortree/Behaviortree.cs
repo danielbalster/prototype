@@ -12,10 +12,12 @@ namespace Prototype.Behaviortree
 
         public string Name { get; set; } = "Untitled";
 
-        public Status Execute(object sender)
+        public Status Result { get; set; }
+
+        public Status Execute(Blackboard bb)
         {
             if (Root == null) return Status.Error;
-            return Root.Execute(sender);
+            return Root.Execute(bb);
         }
     }
 }

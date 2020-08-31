@@ -18,29 +18,67 @@ namespace Prototype
         Animal,
     }
 
-    public class Unit
+    public class Unit : IDisposable
     {
-        Behaviortree.Behaviortree behavior;
         public Vector Position = new Vector();
         public bool Selected = false;
         public UnitTypes Type = UnitTypes.Military;
+        public int GroupdId = 0;
+        public Guid Id { get; private set; } = Guid.NewGuid();
+
+        private Behaviortree.Blackboard blackboard = new Behaviortree.Blackboard();
+        private Behaviortree.Behaviortree behavior = null;
+        private World world = null;
+
+        public Behaviortree.Blackboard Blackboard
+        {
+            get => blackboard;
+            set
+            {
+                if (blackboard != value)
+                {
+                    blackboard = value;
+                }
+            }
+        }
 
         public Behaviortree.Behaviortree Behavior
         {
-            get { return behavior; }
-            set { behavior = value; }
+            get => behavior;
+            set
+            {
+                if (behavior != value)
+                {
+                    behavior = value;
+                    blackboard.Set(Guid.Empty, "unit", this);
+                }
+            }
         }
-
-        public Unit()
+        public World World
         {
+            get => world;
+            set
+            {
+                if (world != value)
+                {
+                    world = value;
+                    blackboard.Set(Guid.Empty, "world", world);
+                }
+            }
         }
 
         public void Update()
         {
-            if (behavior != null)
+            if (Behavior != null)
             {
-                var status = behavior.Execute(this);
+                Behavior.Result = Behavior.Execute(blackboard);
             }
+        }
+
+        public void Dispose()
+        {
+            Behavior = null;
+            World = null;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Prototype.Behaviortree
 {
-    class Decorator : Node
+    public class Decorator : Node
     {
         public override AmountType AmountChildren { get => AmountType.One; }
 
@@ -26,12 +26,12 @@ namespace Prototype.Behaviortree
 
         public Decorator()
         {
-            Capacity = 1;
+            //Capacity = 1;
         }
 
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
-            return this[0].Execute(sender);
+            return this[0].Execute(bb);
         }
     }
 }

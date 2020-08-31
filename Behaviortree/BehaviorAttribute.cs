@@ -9,6 +9,7 @@ namespace Prototype.Behaviortree
     public class NodeAttribute : Attribute
     {
         public string Description { get; set; }
+        public Type Type { get; set; }
     }
 
     public class PropertyAttribute : Attribute

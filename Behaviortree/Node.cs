@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace Prototype.Behaviortree
 {
@@ -14,7 +15,7 @@ namespace Prototype.Behaviortree
         Many,
     }
 
-    public class Node : List<Node>
+    public class Node : ObservableCollection<Node>
     {
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -28,45 +29,59 @@ namespace Prototype.Behaviortree
             }
         }
 
-        protected virtual void OnOpen(object sender)
+        protected virtual void OnOpen(Blackboard bb)
         {
         }
 
-        protected virtual void OnClose(object sender)
+        protected virtual void OnClose(Blackboard bb)
         {
         }
 
-        protected virtual void OnEnter(object sender)
+        protected virtual void OnEnter(Blackboard bb)
         {
 
         }
-        protected virtual void OnExit(object sender)
+        protected virtual void OnExit(Blackboard bb)
         {
 
         }
-        protected virtual Status OnExecute(object sender)
+        protected virtual Status OnExecute(Blackboard bb)
         {
             return Status.Error;
         }
 
-        public Status Execute(object sender)
+        /*
+         * ?!#$ are internal keys, they can be hidden in editors.
+         * 
+         * ? = is a node currently open or closed?
+         * ! = last state of a node
+         * # = iterator of sequences/selectors
+         * 
+         */
+
+        public Status Execute(Blackboard bb)
         {
-            OnEnter(sender);
-            object isOpen = false;
-            Blackboard.Get(sender, Id, "isOpen", out  isOpen);
+            OnEnter(bb);
+            bb.Get(Id, "?", out object isOpen);
             if (isOpen==null || !(bool)isOpen)
             {
-                Blackboard.Set(sender, Id, "isOpen", true);
-                OnOpen(sender);
+                bb.Set(Id, "?", true);
+                OnOpen(bb);
             }
-            var status = OnExecute(sender);
+            var status = OnExecute(bb);
+            bb.Set(Id, "!", status);
             if (status != Status.Running)
             {
-                OnClose(sender);
-                Blackboard.Set(sender, Id, "isOpen", false);
+                OnClose(bb);
+                bb.Set(Id, "?", false);
             }
-            OnExit(sender);
+            OnExit(bb);
             return status;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
 
     }

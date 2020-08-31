@@ -1,26 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Prototype.Behaviortree
 {
-    static class Blackboard
+    public class Blackboard
     {
-        static Dictionary<Tuple<int, Guid,string>,object> store = new Dictionary<Tuple<int, Guid, string>, object>();
+        public Dictionary<Tuple<Guid,string>,object> store = new Dictionary<Tuple<Guid, string>, object>();
 
-        public static bool Get(object sender, Guid nodeScope, string key, out object value)
+        public bool Get(Guid nodeScope, string key, out object value)
         {
-            return store.TryGetValue(new Tuple<int, Guid, string>(sender.GetHashCode(), nodeScope, key), out value);
+            return store.TryGetValue(new Tuple<Guid, string>(nodeScope, key), out value);
         }
-        public static void Set(object sender, Guid nodeScope, string key, object value)
+
+        public bool Get<T>(Guid nodeScope, string key, out T value)
         {
-            store[ new Tuple<int, Guid, string>(sender.GetHashCode(), nodeScope, key) ] = value;
+            if (store.TryGetValue (new Tuple<Guid, string>(nodeScope, key), out object o))
+            {
+                value = (T) o;
+                return true;
+            }
+            value = default(T);
+            return false;
         }
-        public static void Clear(object sender, Guid nodeScope, string key)
+
+        public void Set(Guid nodeScope, string key, object value)
         {
-            store.Remove(new Tuple<int, Guid, string>(sender.GetHashCode(), nodeScope, key));
+            store[ new Tuple<Guid, string>(nodeScope, key) ] = value;
         }
+
+        public void Clear(Guid nodeScope, string key)
+        {
+            store.Remove(new Tuple<Guid, string>( nodeScope, key));
+        }
+
     }
 }

@@ -71,9 +71,9 @@ namespace Prototype
         System.Random random = new System.Random();
         private void addRandom()
         {
-            for (int i = 0; i < 5; ++i)
+            //for (int i = 0; i < 100; ++i)
             {
-                var unit = new Unit();
+                var unit = new Unit { World = Model };
                 unit.Position.X = random.Next(-100, +100);
                 unit.Position.Y = random.Next(-100, +100);
                 unit.Selected = true;
@@ -87,8 +87,8 @@ namespace Prototype
             for (int x=-10; x<10; x++)
                 for (int y = -10; y < 10; y++)
                 {
-                    var unit = new Unit();
-                unit.Position.X = x*10;
+                    var unit = new Unit { World = Model };
+                    unit.Position.X = x*10;
                 unit.Position.Y = y*10;
                 unit.Selected = true;
                     unit.Type = UnitType;
@@ -99,10 +99,9 @@ namespace Prototype
 
         private void addSingle()
         {
-            var unit = new Unit();
-            unit.Position.X = 0;
-            unit.Position.Y = 0;
-            unit.Selected = true;
+            var unit = new Unit { World = Model };
+            unit.Position = Model.CameraPosition;
+            unit.Selected = false;
             unit.Type = UnitType;
             unit.Behavior = Model.FindBehaviortreeByName("Hello World Printer");
             Model.Units.Add(unit);
@@ -127,9 +126,5 @@ namespace Prototype
             foreach (var unit in Model.Units) unit.Selected = true;
         }
 
-        internal void Update()
-        {
-            Model.Update();
-        }
     }
 }

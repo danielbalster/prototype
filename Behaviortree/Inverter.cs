@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace Prototype.Behaviortree
 {
     [Node]
-    sealed class Inverter : Decorator
+    sealed public class Inverter : Decorator
     {
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
-            var status = this[0].Execute(sender);
+            var status = this[0].Execute(bb);
             switch(status)
             {
                 case Status.Success: return Status.Failure;

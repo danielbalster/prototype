@@ -3,90 +3,125 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Prototype"
         mc:Ignorable="d"
-        Title="Multi-Selection Prototype" Height="822.176" Width="1132" WindowStartupLocation="CenterScreen">
+        Title="Multi-Selection Prototype"
+        Height="720"
+        Width="1280"
+        WindowStartupLocation="CenterScreen"
+    >
     <Window.Resources>
+        
+    <ControlTemplate x:Key="group" TargetType="ItemsControl">
+        <Expander Header="{TemplateBinding ItemStringFormat}" IsExpanded="True" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}">
+            <Border Margin="2" BorderThickness="1" CornerRadius="5" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
+                <ItemsPresenter Margin="4"/>
+            </Border>
+        </Expander>
+    </ControlTemplate>
+
+    <ObjectDataProvider x:Key="hitTestModesEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="local:HitTestModes"/>
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1000*"/>
+            <ColumnDefinition Width="4"/>
+            <ColumnDefinition Width="280*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="500*"/>
             <RowDefinition Height="4"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="220*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
 
-            <TabControl Grid.Column="0">
-                <TabItem Header="Units">
-                    <ScrollViewer>
-                    <ContentControl Content="{Binding UnitsEditor}" ContentTemplate="{StaticResource unitsEditor}" />
-                    </ScrollViewer>
-                </TabItem>
-                <TabItem Header="Behaviors">
-                    <ScrollViewer>
-                    <ContentControl Content="{Binding BehaviortreesEditor}" ContentTemplate="{StaticResource behaviortreeEditor}" />
-                    </ScrollViewer>
-
-                </TabItem>
-                <TabItem Header="Inputmappings">
-                </TabItem>
-            </TabControl>
-            <Grid Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="150"/>
-                </Grid.ColumnDefinitions>
+        <ScrollViewer Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" >
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.ColumnSpan="2" FontWeight="Bold">Selection Method</Label>
-                <RadioButton Grid.Row="1" x:Name="cb_crosshair" Grid.Column="0" Grid.ColumnSpan="2" Content="2D Crosshair" IsChecked="True"/>
-                <RadioButton Grid.Row="2" x:Name="cb_selectioncircle" Grid.Column="0" Grid.ColumnSpan="2" Content="Screenspace Circle" IsChecked="False"/>
-                <RadioButton Grid.Row="3" x:Name="cb_wscircle" Grid.Column="0" Grid.ColumnSpan="2" Content="Worldspace Circle" IsChecked="False"/>
-                <Label Grid.Row="4" >Size</Label>
-                <Slider Grid.Row="4" x:Name="sl_size" Grid.Column="1" Maximum="500" Minimum="1" Value="100" />
-                <Label Grid.Row="5" >Opacity</Label>
-                <Slider Grid.Row="5" x:Name="sl_crosshair" Grid.Column="1" Maximum="1" Minimum="-2" Value="0.5" />
-                <Separator Grid.Row="6" Grid.ColumnSpan="2"/>
-                <CheckBox Grid.Row="7" x:Name="cb_showbounds" Grid.Column="0" Grid.ColumnSpan="2" Content="Show 2D Bounds" IsChecked="True"/>
 
-                <Label Grid.Row="8" >Above Ground</Label>
-                <Slider Grid.Row="8" Grid.Column="1" Maximum="300" Minimum="0" Value="{Binding aboveGround}" />
-                <Label Grid.Row="9" >Camera Pitch</Label>
-                <Slider Grid.Row="9" Grid.Column="1" Maximum="0" Minimum="-360" Value="{Binding pitch}" />
+                <ItemsControl Grid.Row="0" Template="{StaticResource group}" ItemStringFormat="Selection Cursor" >
+                    <RadioButton x:Name="cb_crosshair" Content="2D Crosshair" IsChecked="True"/>
+                    <RadioButton x:Name="cb_selectioncircle" Content="Screenspace Circle" IsChecked="False"/>
+                    <RadioButton x:Name="cb_wscircle" Content="Worldspace Cylinder" IsChecked="False"/>
+                    <RadioButton x:Name="cb_custom" Content="Off" IsChecked="False"/>
 
+                    <DockPanel>
+                        <TextBlock Width="100" >Hittest</TextBlock>
+                        <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource hitTestModesEnum}}"
+                          SelectedItem="{Binding Path=HitTestMode, Mode=TwoWay}" />
+                    </DockPanel>
+
+                    <DockPanel>
+                        <TextBlock Width="100" >Opacity</TextBlock>
+                        <Slider x:Name="sl_crosshair"  Maximum="1" Minimum="0" Value="0.5" />
+                    </DockPanel>
+                <DockPanel >
+                    <TextBlock Width="100" >Thickness</TextBlock>
+                    <Slider  x:Name="sl_thickness"  Maximum="5" Minimum="0" Value="0.5" />
+                </DockPanel>
+                    <DockPanel >
+                        <TextBlock Width="100" >Size</TextBlock>
+                        <Slider x:Name="sl_size"  Maximum="500" Minimum="1" Value="100"  />
+                    </DockPanel>
+                </ItemsControl>
+                <ItemsControl Grid.Row="1" Template="{StaticResource group}" ItemStringFormat="Camera">
+                    <DockPanel >
+                        <TextBlock Width="100" Text="{Binding Camera.FOV, StringFormat={}FOV:{0:#.#}}"/>
+                        <Slider  Maximum="120" Minimum="0" Value="{Binding Camera.FOV}" />
+                    </DockPanel>
+                    <DockPanel >
+                        <TextBlock Width="100" Text="{Binding Camera.Yaw, StringFormat={}Yaw:{0:#.#}}"/>
+                        <Slider Maximum="360" Minimum="0" Value="{Binding Camera.Yaw}" />
+                    </DockPanel>
+                    <DockPanel >
+                    <TextBlock Width="100" Text="{Binding Camera.Zoom, StringFormat={}Zoom:{0:#.#}}"/>
+                    <Slider Maximum="1000" Minimum="5" Value="{Binding Camera.Zoom}" />
+                </DockPanel>
+                <DockPanel >
+                    <TextBlock Width="100" Text="{Binding Camera.Pitch, StringFormat={}Pitch:{0:#.#}}"/>
+                    <Slider Maximum="0" Minimum="-90" Value="{Binding Camera.Pitch}" />
+                </DockPanel>
+            </ItemsControl>
+                <ItemsControl Grid.Row="2" Template="{StaticResource group}" ItemStringFormat="Gizmos">
+                <CheckBox x:Name="cb_showbounds" Content="Show 2D Bounds" IsChecked="False"/>
+                <CheckBox x:Name="cb_showbounds3" Content="Show 3D Bounds" IsChecked="False"/>
+            </ItemsControl>
 
             </Grid>
-        </Grid>
+    </ScrollViewer>
 
-        <Grid  Grid.Row="0" >
+        <TabControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
+            <TabItem Header="Units">
+                <ContentControl Content="{Binding UnitsEditor}" ContentTemplate="{StaticResource unitsEditor}" />
+            </TabItem>
+            <TabItem Header="Behaviors">
+                <ContentControl Content="{Binding BehaviortreesEditor}" ContentTemplate="{StaticResource behaviortreeEditor}" />
+            </TabItem>
+            <TabItem Header="Input Actions">
+            </TabItem>
+        </TabControl>
+
+        <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" ResizeDirection="Columns" Height="auto" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" ResizeDirection="Rows" Width="auto" Height="4" HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Column="0" HorizontalAlignment="Stretch" >
             <Viewport3D x:Name="Viewport">
                 <Viewport3D.Camera>
-                    <PerspectiveCamera  x:Name="Camera"
-                                        Position="0 10 10"
-                                        LookDirection="0 -0.3 -1"
-                                        UpDirection="0, 1, 0"
-                                        FieldOfView="90"/>
+                    <MatrixCamera x:Name="camera"/>
                 </Viewport3D.Camera>
                 <Viewport3D.Children>
-
+                    
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
                             <Model3DGroup x:Name="gizmos">
@@ -96,8 +131,46 @@
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
 
-                    <ModelVisual3D x:Name="Models">
-                    </ModelVisual3D>
+                    <ContainerUIElement3D  x:Name="Models">
+                    </ContainerUIElement3D>
+<!--
+                    <Viewport2DVisual3D >
+                        <Viewport2DVisual3D.Transform>
+                            <Transform3DGroup>
+                                <ScaleTransform3D ScaleX="{Binding ElementName=sl_size, Path=Value}"
+                                                   ScaleZ="{Binding ElementName=sl_size, Path=Value}"
+                                                  />
+                                <TranslateTransform3D OffsetX="{Binding Camera.Position.X}" OffsetZ="{Binding Camera.Position.Y}"/>
+                            </Transform3DGroup>
+
+                        </Viewport2DVisual3D.Transform>
+                        <Viewport2DVisual3D.Geometry>
+                            <MeshGeometry3D Positions="-0.1 0.5 0.1   -0.1 0.5 -0.1   0.1 0.5 -0.1   0.1 0.5 0.1"
+                                TextureCoordinates="0 0 0 1 1 1 1 0"
+                                TriangleIndices="2 1 0 3 2 0" />
+                        </Viewport2DVisual3D.Geometry>
+                        <Viewport2DVisual3D.Material>
+                            <DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" />
+                        </Viewport2DVisual3D.Material>
+                        <Ellipse x:Name="selectioncircle3" 
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Width="512"
+                            Height="512"
+                            StrokeThickness="1"
+                            Stroke="Black">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsChecked,ElementName=cb_wscircle}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+
+                        </Ellipse>
+                    </Viewport2DVisual3D>
+                    -->
                 </Viewport3D.Children>
             </Viewport3D>
             <Canvas x:Name="wireframe"  ClipToBounds="True"/>
@@ -133,10 +206,11 @@
                   Opacity="{Binding ElementName=sl_crosshair, Path=Value}"
                   >
                 <Ellipse x:Name="selectioncircle" 
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Width="{Binding ElementName=sl_size, Path=Value}"
-                         Height="{Binding ElementName=sl_size, Path=Value}"
-                     Stroke="Black" StrokeThickness="0.5"/>
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Width="{Binding ElementName=sl_size, Path=Value}"
+                    Height="{Binding ElementName=sl_size, Path=Value}"
+                    StrokeThickness="{Binding ElementName=sl_thickness, Path=Value}"
+                    Stroke="Black"/>
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
@@ -147,27 +221,25 @@
                     </Style>
                 </Grid.Style>
             </Grid>
-            <Border BorderBrush="{x:Null}">
-            <TextBlock DataContext="{Binding Controller}" FontWeight="Bold" FontSize="18"
+            <Border BorderBrush="{x:Null}" SizeChanged="Border_SizeChanged">
+                <TextBlock DataContext="{Binding Controller}" FontWeight="Bold" FontSize="18"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        >
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="Red" />
-                        <Setter Property="Text" Value="CONTROLLER NOT CONNECTED!" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Red" />
+                            <Setter Property="Text" Value="CONTROLLER NOT CONNECTED!" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Border>
         </Grid>
-
-
 
     </Grid>
 </Window>

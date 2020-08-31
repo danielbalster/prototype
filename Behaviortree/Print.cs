@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace Prototype.Behaviortree
 {
     [Node]
-    class Print : Node
+    public class Print : Node
     {
         public string Text { get; set; } = "empty";
 
-        protected override Status OnExecute(object sender)
+        protected override Status OnExecute(Blackboard bb)
         {
             Console.WriteLine(Text);
             return Status.Success;

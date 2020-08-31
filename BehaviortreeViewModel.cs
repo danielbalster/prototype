@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prototype.Behaviortree;
+using System.Windows;
+using System.Windows.Controls;
+using System.Reflection;
 
 namespace Prototype
 {
@@ -12,6 +15,14 @@ namespace Prototype
         public BehaviortreeViewModel(Behaviortree.Behaviortree model)
         {
             Model = model;
+            if (model != null)
+            TreeRoot = (INodeViewModel) ViewModelFactory.Create(model.Root);
+        }
+        public INodeViewModel TreeRoot { get; set; } = null;
+
+        public INodeViewModel FindNode(Guid guid)
+        {
+            return TreeRoot.FindNode(guid);
         }
 
         #region Root
@@ -48,7 +59,7 @@ namespace Prototype
                 }
             }
         }
-        #endregion
+#endregion
     }
  
 }

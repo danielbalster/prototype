@@ -5,42 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace Prototype
 {
-    public class StoryboardHelper : DependencyObject
-    {
-        public static bool GetBeginIf(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(BeginIfProperty);
-        }
-
-        public static void SetBeginIf(DependencyObject obj, bool value)
-        {
-            obj.SetValue(BeginIfProperty, value);
-        }
-
-        public static readonly DependencyProperty BeginIfProperty = DependencyProperty.RegisterAttached("BeginIf", typeof(bool), typeof(StoryboardHelper), new PropertyMetadata(false, BeginIfPropertyChangedCallback));
-
-        private static void BeginIfPropertyChangedCallback(DependencyObject s, DependencyPropertyChangedEventArgs e)
-        {
-            var storyboard = s as Storyboard;
-            if (storyboard == null)
-                throw new InvalidOperationException("This attached property only supports Storyboards.");
-
-            var begin = (bool)e.NewValue;
-            if (begin)
-            {
-                //if (storyboard.GetCurrentState()==ClockState.Stopped) storyboard.Begin();
-            }
-            else
-            {
-                //if (storyboard.GetCurrentState() != ClockState.Stopped) storyboard.Stop();
-            }
-        }
-    }
-
-    class Helper
+    static class Helper
     {
         public static object FindResource(string key)
         {
@@ -51,6 +21,40 @@ namespace Prototype
                     return res;
             }
             return null;
+        }
+
+        public const double DegreesToRadians = 0.01745329252;
+
+        static public Matrix3D GetProjectionMatrix(double near, double far, double fov, double aspectRatio)
+        {
+            double hFoV = DegreesToRadians * fov;
+            double xScale = 1 / Math.Tan(hFoV / 2);
+            double yScale = aspectRatio * xScale;
+            double m33 = (far == double.PositiveInfinity) ? -1 : (far / (near - far));
+            double m43 = near * m33;
+            return new Matrix3D(
+                xScale, 0, 0, 0,
+                0, yScale, 0, 0,
+                0, 0, m33, -1,
+                0, 0, m43, 0
+            );
+        }
+
+        // is any of the four ``bounds´´ corners in the circle around crosshair with radius?
+        static public bool TouchesCircle(Rect bounds, Point crosshair, double radius)
+        {
+            return (((bounds.BottomLeft - crosshair).Length < radius) ||
+                ((bounds.BottomRight - crosshair).Length < radius) ||
+                ((bounds.TopLeft - crosshair).Length < radius) ||
+                ((bounds.TopRight - crosshair).Length < radius));
+        }
+
+        static public bool InsideCircle(Rect bounds, Point crosshair, double radius)
+        {
+            return (((bounds.BottomLeft - crosshair).Length < radius) &&
+                ((bounds.BottomRight - crosshair).Length < radius) &&
+                ((bounds.TopLeft - crosshair).Length < radius) &&
+                ((bounds.TopRight - crosshair).Length < radius));
         }
     }
 }
