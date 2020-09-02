@@ -9,10 +9,7 @@ namespace Prototype
 
         public void RaisePropertyChanged(String info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 

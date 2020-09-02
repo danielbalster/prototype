@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Prototype
 {
@@ -24,7 +21,6 @@ namespace Prototype
                 if (ma == null) continue;
 
                 creators[ma.Type] = type;
-
             }
         }
 

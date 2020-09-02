@@ -153,26 +153,6 @@ namespace Prototype
             Behaviortrees.Add(
                 new Behaviortree.Behaviortree
                 {
-                    Name = "aaaaaaa",
-                    Root =
-                    new Behaviortree.Decorator {
-                    new Behaviortree.Decorator {
-                    new Behaviortree.Decorator {
-                    new Behaviortree.Decorator {
-                                 Child = new Behaviortree.Print {
-                                     Text = "Hello, World!"
-                                 }
-                    }
-                    }
-                    }
-                    }
-                }
-            );
-
-
-            Behaviortrees.Add(
-                new Behaviortree.Behaviortree
-                {
                     Name = "Hello World Printer",
                     Root =
                     new Behaviortree.Decorator {

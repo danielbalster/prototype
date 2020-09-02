@@ -307,5 +307,50 @@ namespace Prototype.Behaviortree
         }
     }
 
+    [Model(Type = typeof(Succeeder))]
+    public class SucceederViewModel : NodeViewModelBase<Succeeder>
+    {
+        public SucceederViewModel(Succeeder model) : base(model)
+        {
+        }
+    }
+
+    [Model(Type = typeof(Failer))]
+    public class FailerViewModel : NodeViewModelBase<Failer>
+    {
+        public FailerViewModel(Failer model) : base(model)
+        {
+        }
+    }
+
+    [Model(Type = typeof(Repeater))]
+    public class RepeaterViewModel : NodeViewModelBase<Repeater>
+    {
+        public int N
+        {
+            get => Model.N;
+            set
+            {
+                if (Model.N != value)
+                {
+                    Model.N = value;
+                    RaisePropertyChanged("N");
+                }
+            }
+        }
+
+        public RepeaterViewModel(Repeater model) : base(model)
+        {
+        }
+    }
+
+    [Model(Type = typeof(RepeatUntilFail))]
+    public class RepeatUntilFailViewModel : NodeViewModelBase<RepeatUntilFail>
+    {
+        public RepeatUntilFailViewModel(RepeatUntilFail model) : base(model)
+        {
+        }
+    }
+
 
 }

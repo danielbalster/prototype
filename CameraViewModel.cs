@@ -73,7 +73,6 @@ namespace Prototype
             }
         }
         #endregion
-
         #region Position
         public Vector Position
         {
@@ -91,7 +90,6 @@ namespace Prototype
             }
         }
         #endregion
-
         #region Near
         public double Near
         {

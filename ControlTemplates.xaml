@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d">
 
+    <!-- X close icon without circle -->
+    
     <ControlTemplate x:Key="XButton" TargetType="Button">
         <Grid>
             <Rectangle Width="30" Height="18" Fill="Transparent" IsHitTestVisible="True"/>
@@ -25,6 +27,8 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
+    <!-- + icon with circle -->
+    
     <ControlTemplate x:Key="AddButton" TargetType="Button">
         <Grid>
             <Rectangle Width="18" Height="18" Fill="Transparent" IsHitTestVisible="True"/>
@@ -46,6 +50,8 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
+    <!-- Expander without icon and full width stretch -->
+    
     <ControlTemplate x:Key="ExpanderControlTemplate" TargetType="{x:Type Expander}">
         <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="True">
             <DockPanel>

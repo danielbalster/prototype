@@ -20,11 +20,11 @@ namespace Prototype
             modelVisual3D.MouseDown += OnMouseDown;
             modelVisual3D.MouseUp += OnMouseUp;
             geometryModel3D.Geometry = Helper.FindResource("cubeMesh") as Geometry3D;
-            geometryModel3D.Material = Helper.FindResource("normalMaterial") as Material;
             behaviortree = new BehaviortreeViewModel(Model.Behavior);
             blackboard = new BlackboardViewModel(Model.Blackboard);
         }
 
+        #region Blackboard
         BlackboardViewModel blackboard;
         public BlackboardViewModel Blackboard
         {
@@ -38,6 +38,7 @@ namespace Prototype
                 }
             }
         }
+        #endregion
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -77,6 +78,7 @@ namespace Prototype
         private GeometryModel3D geometryModel3D = new GeometryModel3D();
         #endregion
 
+        #region Type
         public UnitTypes Type
         {
             get
@@ -92,6 +94,7 @@ namespace Prototype
                 }
             }
         }
+        #endregion
 
         public bool Selected
         {
@@ -114,6 +117,7 @@ namespace Prototype
             get => Model.Id;
         }
 
+        #region Behaviortree
         BehaviortreeViewModel behaviortree;
         public BehaviortreeViewModel Behaviortree
         {
@@ -131,7 +135,7 @@ namespace Prototype
                 }
             }
         }
-
+        #endregion
         #region X
         public double X
         {

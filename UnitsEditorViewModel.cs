@@ -40,6 +40,7 @@ namespace Prototype
 
         public ObservableCollection<UnitViewModel> Units { get; set; }
 
+        #region ViewModel Collection
         private void Units_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -65,6 +66,7 @@ namespace Prototype
                     break;
             }
         }
+        #endregion
 
         public UnitTypes UnitType { get; set; }
 

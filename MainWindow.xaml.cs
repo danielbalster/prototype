@@ -270,20 +270,6 @@ namespace Prototype
             }
         }
 
-        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var lb = sender as ListBox;
-            if (lb == null) return;
-            var uvm = (lb.SelectedValue as UnitViewModel);
-            if (uvm == null) return;
-            var root = new Behaviortree.Decorator { uvm.Model.Behavior.Root };
-            var dlg = new Behaviortree.Editor.BehaviortreeEditor { Behavior = root };
-            dlg.ShowDialog();
-            uvm.Model.Behavior.Root = root[0];
-            root.Clear();
-            dlg.Behavior = null;
-        }
-
         private void Border_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (Camera != null)

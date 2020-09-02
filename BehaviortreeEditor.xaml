@@ -5,14 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Prototype"
         xmlns:behavior="clr-namespace:Prototype.Behaviortree"
-    
         mc:Ignorable="d">
 
-
- 
-
-    <local:NodeTemplateSelector x:Key="nodeTemplateSelector">
-    </local:NodeTemplateSelector>
+    <local:NodeTemplateSelector x:Key="nodeTemplateSelector"/>
 
     <Style x:Key="nodeBorderStyle" TargetType="Border">
         <Setter Property="BorderThickness" Value="1"/>
@@ -25,7 +20,7 @@
             <DataTrigger Binding="{Binding Status}" Value="Running">
                 <Setter Property="Background" Value="LightBlue"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding Status}" Value="Failed">
+            <DataTrigger Binding="{Binding Status}" Value="Failure">
                 <Setter Property="Background" Value="#FFF75E73"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="Success">
@@ -117,7 +112,6 @@
 
     <DataTemplate DataType="{x:Type behavior:DecoratorViewModel}">
         <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
-
     </DataTemplate>
 
     <DataTemplate  DataType="{x:Type behavior:NodeViewModel}">
@@ -127,6 +121,23 @@
     <DataTemplate  DataType="{x:Type behavior:HasTargetViewModel}">
     </DataTemplate>
     <DataTemplate  DataType="{x:Type behavior:FindTargetViewModel}">
+    </DataTemplate>
+
+    <DataTemplate  DataType="{x:Type behavior:SucceederViewModel}">
+    </DataTemplate>
+    <DataTemplate  DataType="{x:Type behavior:FailerViewModel}">
+    </DataTemplate>
+    <DataTemplate  DataType="{x:Type behavior:RepeaterViewModel}">
+        <StackPanel Orientation="Vertical" >
+            <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+                <TextBlock DockPanel.Dock="Left" Text="N:"/>
+                <TextBox Text="{Binding N}"/>
+            </DockPanel>
+            <ContentControl Style="{StaticResource ccStyle}" ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}" />
+        </StackPanel>
+    </DataTemplate>
+    <DataTemplate  DataType="{x:Type behavior:RepeatUntilFailViewModel}">
+        <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
     </DataTemplate>
 
 
@@ -140,12 +151,9 @@
                 <Button Content="Save" Command="{Binding Save}"/>
                 <ToggleButton Content="Play" IsChecked="{Binding Path=DataContext.World.Playing, RelativeSource={RelativeSource AncestorLevel=1, Mode=FindAncestor, AncestorType={x:Type TabControl}},Mode=TwoWay}"
                               />
-
             </ToolBar>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="4"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -158,9 +166,7 @@
 
                 <GridSplitter Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" ResizeDirection="Columns" Height="auto" HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                 <GridSplitter Grid.Row="0" Grid.RowSpan="3" Grid.Column="3" ResizeDirection="Columns" Height="auto" HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                <GridSplitter Grid.Row="1" Grid.Column="0" ResizeDirection="Rows" Width="auto" HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
 
-                <!-- list of behaviors -->
                 <ListBox Grid.Row="0" Grid.Column="0"
                      ItemsSource="{Binding Behaviortrees}"
                      VirtualizingStackPanel.VirtualizationMode="Recycling"
@@ -182,23 +188,6 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-
-                <ListBox Grid.Row="2"  Grid.Column="0"
-                     ItemsSource="{Binding DraggableNodes}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border 
-                                local:DragDropBehavior.IsDragSource="True"
-                                BorderThickness="1" CornerRadius="5" BorderBrush="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" >
-                                <StackPanel Orientation="Vertical"  Margin="1">
-                                    <TextBlock Text="{Binding Type.Name}" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Description}"/>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
                 <DockPanel Grid.Row="0" Grid.RowSpan="3"  Grid.Column="4">
                     <DockPanel DockPanel.Dock="Top">
                         <TextBlock DockPanel.Dock="Left">Unit:</TextBlock>
@@ -244,100 +233,11 @@
                                   VerticalScrollBarVisibility="Auto"
                                   >
                     <Canvas>
-                    <ContentControl
-                        Margin="10"
-                        ContentTemplate="{StaticResource nodeBox}"
-                        Content="{Binding Current.TreeRoot}"  />
+                        <ContentControl
+                            Margin="10"
+                            ContentTemplate="{StaticResource nodeBox}"
+                            Content="{Binding Current.TreeRoot}"  />
                     </Canvas>
-
-
-                    <!--
-ContentTemplate="{StaticResource nodeDataTemplate}"
-                    <TreeView 
-                        DataContext="{Binding Current}"
-                        ItemsSource="{Binding Root}"
-                        ContextMenu="{Binding ContextMenu}"
-                        local:TreeViewHelper.SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay}"
-                              >
-                        <TreeView.ItemContainerStyle>
-                            <Style TargetType="TreeViewItem">
-                                <Setter Property="IsExpanded" Value="True" />
-                            </Style>
-                        </TreeView.ItemContainerStyle>
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate  DataType="{x:Type behavior:Delay}" ItemsSource="{Binding}">
-                                <Border Margin="3" BorderBrush="Black" BorderThickness="1">
-                                    <StackPanel Orientation="Horizontal" Margin="0 0 10 0">
-                                        <TextBlock Text="{Binding Name}" />
-                                        <TextBox Text="{Binding Milliseconds}" />
-                                        <TextBlock Text="{Binding Id}" FontSize="6" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                                    </StackPanel>
-                                </Border>
-                            </HierarchicalDataTemplate>
-
-                            <HierarchicalDataTemplate  DataType="{x:Type behavior:Print}">
-                                <Border Margin="3" BorderBrush="Black" BorderThickness="1">
-                                    <StackPanel Orientation="Horizontal" Margin="0 0 10 0">
-                                        <TextBlock Text="{Binding Name}" />
-                                        <TextBlock Text="&quot;"/>
-                                        <TextBox Text="{Binding Text}" />
-                                        <TextBlock Text="&quot;"/>
-                                        <TextBlock Text="{Binding Id}" FontSize="6" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                                    </StackPanel>
-                                </Border>
-                            </HierarchicalDataTemplate>
-
-                            
-                    <HierarchicalDataTemplate DataType="{x:Type behavior:Composite}" ItemsSource="{Binding}">
-                        <Border Margin="3" BorderBrush="Black" BorderThickness="1">
-                            <StackPanel Orientation="Horizontal" Margin="0 0 10 0">
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text="{Binding Id}" FontSize="6" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                            </StackPanel>
-                        </Border>
-                    </HierarchicalDataTemplate>
-
-                    <HierarchicalDataTemplate  DataType="{x:Type behavior:Node}" >
-                        <StackPanel Orientation="Horizontal" Margin="0 0 10 0">
-                            <TextBlock Text="{Binding Name}" />
-                            <TextBlock Text="{Binding Id}" FontSize="6" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-
-                    </TreeView.Resources>
-                    </TreeView>
-                    <ItemsControl  Visibility="Collapsed"
-                  Background="LightGray" 
-                  ItemsSource="{Binding Current.Nodes}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="100" Height="20" BorderBrush="Black" BorderThickness="1" CornerRadius="5"
-                                    >
-                                <Border.Background>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FF6E8B8B" Offset="0"/>
-                                        <GradientStop Color="#FF12A447" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <TextBlock Text="{Binding Name}" TextAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-
-                    <ItemsControl.ItemContainerStyle>
-                        <Style TargetType="{x:Type ContentPresenter}">
-                            <Setter Property="Canvas.Left" Value="{Binding Path=PX}"/>
-                            <Setter Property="Canvas.Top" Value="{Binding Path=PY}"/>
-                        </Style>
-                    </ItemsControl.ItemContainerStyle>
-                </ItemsControl>
-                    -->
                 </ScrollViewer>
             </Grid>
         </DockPanel>

@@ -11,8 +11,6 @@ namespace Prototype
 {
     public class NodeTemplateSelector : DataTemplateSelector
     {
-        //public ResourceDictionary Templates { get; set; } = new ResourceDictionary();
-
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var nvm = item as NodeViewModel;

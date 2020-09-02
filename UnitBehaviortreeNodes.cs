@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 using Prototype.Behaviortree;
 using System.Windows;
 
+/*
+ * add new behavior tree nodes here
+ * 
+ * next, they also need a ViewModel (NodeViewModel.cs)
+ * next, they also need a datatemplate (BehaviorTreeEditor.xaml)
+ *
+ */
+
 namespace Prototype
 {
     [Node]

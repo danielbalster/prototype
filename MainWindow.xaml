@@ -94,9 +94,9 @@
                 </DockPanel>
             </ItemsControl>
                 <ItemsControl Grid.Row="2" Template="{StaticResource group}" ItemStringFormat="Gizmos">
-                <CheckBox x:Name="cb_showbounds" Content="Show 2D Bounds" IsChecked="False"/>
-                <CheckBox x:Name="cb_showbounds3" Content="Show 3D Bounds" IsChecked="False"/>
-            </ItemsControl>
+                    <CheckBox x:Name="cb_showbounds" Content="Show 2D Bounds" IsChecked="False"/>
+                    <CheckBox x:Name="cb_showbounds3" Content="Show 3D Bounds" IsChecked="False"/>
+                </ItemsControl>
 
             </Grid>
     </ScrollViewer>
