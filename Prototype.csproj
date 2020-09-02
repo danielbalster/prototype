@@ -65,6 +65,7 @@
     <Compile Include="AttachedBehaviors.cs" />
     <Compile Include="BlackboardViewModel.cs" />
     <Compile Include="DragDropBehavior.cs" />
+    <Compile Include="DropCursorAdorner.cs" />
     <Compile Include="NodeTemplateSelector.cs" />
     <Compile Include="NodeViewModel.cs" />
     <Compile Include="BehaviortreeViewModel.cs" />
@@ -109,6 +110,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Behaviortree\Editor\BehaviortreeEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ControlTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

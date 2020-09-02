@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Prototype.Behaviortree
+﻿namespace Prototype.Behaviortree
 {
     public class Decorator : Node
     {
         public override AmountType AmountChildren { get => AmountType.One; }
 
-        public Node Child
+        public INode Child
         {
             get
             {
@@ -24,13 +17,9 @@ namespace Prototype.Behaviortree
             }
         }
 
-        public Decorator()
-        {
-            //Capacity = 1;
-        }
-
         protected override Status OnExecute(Blackboard bb)
         {
+            if (Count == 0) return Status.Error;
             return this[0].Execute(bb);
         }
     }

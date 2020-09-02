@@ -37,7 +37,21 @@ namespace Prototype
             timer.Tick += OnTimerTick;
             timer.Start();
 
+            AddBehaviortree = new RelayCommand(arg => {
+                Model.Behaviortrees.Add(new Behaviortree.Behaviortree { Name = "Untitled", Root = new Behaviortree.Decorator() });
+            });
+            RemoveBehaviortree = new RelayCommand(arg => {
+                if (Current != null)
+                    Model.Behaviortrees.Remove(Current.Model);
+            });
+            Load = new RelayCommand(arg => { });
+            Save = new RelayCommand(arg => { });
         }
+
+        public ICommand AddBehaviortree { get; private set; }
+        public ICommand RemoveBehaviortree { get; private set; }
+        public ICommand Load { get; private set; }
+        public ICommand Save { get; private set; }
 
         private void OnTimerTick(object sender, EventArgs e)
         {
@@ -102,9 +116,9 @@ namespace Prototype
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (Behaviortree.Behaviortree bt in e.OldItems)
+                    for (int i = 0; i < e.OldItems.Count; ++i)
                     {
-                        Behaviortrees.Remove(Behaviortrees.Where(x => x.Model == bt).Single());
+                        Behaviortrees.RemoveAt(e.OldStartingIndex + i);
                     }
                     break;
                 case NotifyCollectionChangedAction.Move:

@@ -6,22 +6,51 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections.Specialized;
+using System.Windows.Input;
+using System.Collections;
+using System.ComponentModel;
+using System.Reflection;
+using System.Windows.Controls;
 
 namespace Prototype.Behaviortree
 {
-    public interface INodeViewModel
+    public interface INodeViewModel : INotifyPropertyChanged
     {
         INodeViewModel FindNode(Guid guid);
         Status Status { get; set; }
         Guid Id { get; }
         string Name { get; }
         AmountType AmountChildren { get; }
+        INodeViewModel Parent { get; set; }
+        ObservableCollection<INodeViewModel> Children { get; set; }
+        void Remove(INodeViewModel child);
+        INode DataModel { get; }
     }
 
     public class NodeViewModelBase<T> : ViewModelBase<T> , INodeViewModel
         where T : Node
     {
-        public List<INodeViewModel> Children { get; set; } = new List<INodeViewModel>();
+        public ObservableCollection<INodeViewModel> Children { get; set; } = new ObservableCollection<INodeViewModel>();
+
+        class CreateArgs
+        {
+            public Type Type { get; set; }
+            public INodeViewModel Node { get; set; }
+        }
+
+        static Dictionary<string, NodeAttribute> NodeTypes = new Dictionary<string, NodeAttribute>();
+        static NodeViewModelBase()
+        {
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                var na = type.GetCustomAttribute<NodeAttribute>();
+                if (na != null)
+                {
+                    na.Type = type;
+                    NodeTypes.Add(type.Name, na);
+                }
+            }
+        }
 
         public NodeViewModelBase(T model)
         {
@@ -31,9 +60,56 @@ namespace Prototype.Behaviortree
             foreach (var item in Model)
             {
                 var vm = (INodeViewModel)ViewModelFactory.Create(item);
-                if (vm != null) Children.Add(vm);
+                if (vm != null)
+                {
+                    vm.Parent = this;
+                    Children.Add(vm);
+                }
             }
+
+            Delete = new RelayCommand(arg =>
+            {
+                if (Parent != null)
+                    Parent.Remove(this);
+            });
+
+            Create = new RelayCommand(arg =>
+            {
+                ContextMenu.Items.Clear();
+                foreach( var de in NodeTypes )
+                {
+                    var mi = new MenuItem();
+                    mi.Header = de.Key;
+                    mi.Command = new RelayCommand((arg2) =>
+                    {
+                        var ca = arg2 as CreateArgs;
+
+                        var node = Activator.CreateInstance(ca.Type) as Prototype.Behaviortree.Node;
+                        ca.Node.DataModel.Add(node);
+                    });
+                    mi.CommandParameter = new CreateArgs { Type = de.Value.Type, Node = this};
+
+                    ContextMenu.Items.Add(mi);
+                }
+                ContextMenu.IsOpen = true;
+
+
+            });
+
+            CheckEmpty();
         }
+
+        public ContextMenu ContextMenu { get; set; } = new ContextMenu();
+
+        public INode DataModel { get => Model; }
+
+        public void Remove(INodeViewModel child)
+        {
+            Model.Remove(child.DataModel);
+        }
+
+        public ICommand Delete { get; private set; }
+        public ICommand Create { get; private set; }
 
         private void Model_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -43,7 +119,11 @@ namespace Prototype.Behaviortree
                     foreach( var item in e.NewItems )
                     {
                         var vm = (INodeViewModel)ViewModelFactory.Create(item);
-                        if (vm != null) Children.Add(vm);
+                        if (vm != null)
+                        {
+                            vm.Parent = this;
+                            Children.Add(vm);
+                        }
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
@@ -54,6 +134,22 @@ namespace Prototype.Behaviortree
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     Children.Clear();
+                    break;
+            }
+
+            CheckEmpty();
+        }
+
+        void CheckEmpty()
+        {
+            switch (AmountChildren)
+            {
+                case AmountType.None:
+                    IsEmpty = false;
+                    break;
+                case AmountType.One:
+                case AmountType.Many:
+                    IsEmpty = Children.Count == 0;
                     break;
             }
         }
@@ -84,9 +180,26 @@ namespace Prototype.Behaviortree
             }
         }
 
+        bool isEmpty = false;
+        public bool IsEmpty
+        {
+            get => isEmpty;
+            set
+            {
+                if (isEmpty != value)
+                {
+                    isEmpty = value;
+                    RaisePropertyChanged("IsEmpty");
+                }
+            }
+        }
+
+
+
         public Guid Id { get => Model.Id; }
         public string Name { get => Model.Name; }
         public AmountType AmountChildren { get => Model.AmountChildren; }
+        public INodeViewModel Parent { get; set; }
     }
 
     [Model(Type=typeof(Node))]

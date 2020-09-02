@@ -6,6 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ControlTemplates.xaml"/>
                 <ResourceDictionary Source="Scene.xaml"/>
                 <ResourceDictionary Source="BehaviortreeEditor.xaml"/>
                 <ResourceDictionary Source="UnitsEditor.xaml"/>

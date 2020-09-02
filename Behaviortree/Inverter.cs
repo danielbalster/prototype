@@ -11,6 +11,7 @@ namespace Prototype.Behaviortree
     {
         protected override Status OnExecute(Blackboard bb)
         {
+            if (Count == 0) return Status.Error;
             var status = this[0].Execute(bb);
             switch(status)
             {

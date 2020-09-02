@@ -15,7 +15,14 @@ namespace Prototype.Behaviortree
         Many,
     }
 
-    public class Node : ObservableCollection<Node>
+    public interface INode : ICollection, IList
+    {
+        Guid Id { get; }
+        string Name { get; }
+        Status Execute(Blackboard bb);
+    }
+
+    public class Node : ObservableCollection<INode>, INode
     {
         public Guid Id { get; } = Guid.NewGuid();
 

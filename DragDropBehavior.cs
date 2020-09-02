@@ -70,13 +70,27 @@ namespace Prototype
             {
                 var fe = (FrameworkElement)obj;
                 fe.PreviewMouseLeftButtonDown += Fe_PreviewMouseLeftButtonDown;
+                fe.DragOver += Fe_DragOver;
+                fe.DragEnter += Fe_DragEnter;
+                fe.DragLeave += Fe_DragLeave;
+                fe.PreviewMouseMove += Fe_PreviewMouseMove;
             }
         }
 
         private static void Fe_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var fe = sender as FrameworkElement;
+
+            if (fe == null) return;
+            var layer = AdornerLayer.GetAdornerLayer(fe);
+            var adorner = new DropCursorAdorner(fe);
+            layer.Add(adorner);
+
             DragDrop.DoDragDrop(fe,new object(), DragDropEffects.Copy);
+
+
+            //layer.Remove(adorner);
+
         }
         #endregion
         #region DropTarget 
@@ -101,34 +115,32 @@ namespace Prototype
             {
                 var fe = (FrameworkElement)obj;
                 fe.AllowDrop = true;
-                fe.DragOver += Fe_DragOver;
-                fe.DragEnter += Fe_DragEnter;
-                fe.DragLeave += Fe_DragLeave;
                 fe.Drop += Fe_Drop;
             }
         }
 
+        private static void Fe_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            e.Action = DragAction.Continue;
+            e.Handled = true;
+        }
+
+        //PreviewDragEnter, PreviewDragOver and PreviewDragLeave
+
+        private static void Fe_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+        }
+
         private static void Fe_DragLeave(object sender, DragEventArgs e)
         {
-            DependencyObject source = e.OriginalSource as DependencyObject;
-            if (source != null)
-            {
-                source.SetValue(DragDropBehavior.IsDraggingProperty, false);
-            }
         }
 
         private static void Fe_DragEnter(object sender, DragEventArgs e)
         {
-            DependencyObject source = e.OriginalSource as DependencyObject;
-            if (source != null)
-            {
-                source.SetValue(DragDropBehavior.IsDraggingProperty, true);
-            }
         }
 
         private static void Fe_DragOver(object sender, DragEventArgs e)
         {
-            e.Effects = DragDropEffects.None;
         }
 
         private static void Fe_Drop(object sender, DragEventArgs e)

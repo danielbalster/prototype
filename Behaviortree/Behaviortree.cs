@@ -8,7 +8,7 @@ namespace Prototype.Behaviortree
 {
     public class Behaviortree
     {
-        public Node Root = null;
+        public INode Root = null;
 
         public string Name { get; set; } = "Untitled";
 

@@ -26,7 +26,7 @@ namespace Prototype
         }
 
         #region Root
-        public Node Root
+        public INode Root
         {
             get
             {

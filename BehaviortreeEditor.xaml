@@ -8,13 +8,16 @@
     
         mc:Ignorable="d">
 
+
+ 
+
     <local:NodeTemplateSelector x:Key="nodeTemplateSelector">
     </local:NodeTemplateSelector>
 
     <Style x:Key="nodeBorderStyle" TargetType="Border">
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="5"/>
-        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Margin" Value="2"/>
         <Setter Property="BorderBrush" Value="Black"/>
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrush}}"/>
         <Setter Property="IsHitTestVisible" Value="True"/>
@@ -31,24 +34,44 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="ccStyle" TargetType="ContentControl">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Button VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Create}" ContextMenu="{Binding ContextMenu}"  Template="{StaticResource AddButton}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <DataTemplate x:Key="nodeBox" DataType="{x:Type behavior:NodeViewModel}">
-        <Border Style="{StaticResource nodeBorderStyle}" Padding="4">
-            <StackPanel Orientation="Vertical" Margin="4 0 0 4" HorizontalAlignment="Stretch">
-                <TextBlock Text="{Binding Name}"/>
-                <ContentControl Content="{Binding}"  />
-            </StackPanel>
+        <Border Style="{StaticResource nodeBorderStyle}" Padding="2" >
+            <Expander IsExpanded="True" Template="{StaticResource ExpanderControlTemplate}">
+                <Expander.Header>
+                    <DockPanel>
+                        <Button Command="{Binding Delete}" DockPanel.Dock="Right" Margin="4 0 0 0" Template="{StaticResource XButton}"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DockPanel>
+                </Expander.Header>
+                <ContentControl Style="{StaticResource ccStyle}" Content="{Binding}"  />
+            </Expander>
         </Border>
+
     </DataTemplate>
 
-
+    
 
     <DataTemplate DataType="{x:Type behavior:DelayViewModel}">
-            <StackPanel Orientation="Vertical" >
-                <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
-                    <TextBlock DockPanel.Dock="Left" Text="Milliseconds:"/>
-                    <TextBox Text="{Binding Milliseconds}"/>
-                </DockPanel>
-            <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"  />
+        <StackPanel Orientation="Vertical" >
+            <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+                <TextBlock DockPanel.Dock="Left" Text="Milliseconds:"/>
+                <TextBox Text="{Binding Milliseconds}"/>
+            </DockPanel>
+            <ContentControl Style="{StaticResource ccStyle}" ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}" />
         </StackPanel>
     </DataTemplate>
 
@@ -61,32 +84,40 @@
 
 
     <DataTemplate  DataType="{x:Type behavior:SelectorViewModel}">
-        <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource nodeBox}">
-            <ItemsControl.ItemsPanel>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" VerticalAlignment="Center"  Command="{Binding Create}" ContextMenu="{Binding ContextMenu}" Template="{StaticResource AddButton}"/>
+            <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource nodeBox}">
+                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
+        </DockPanel>
     </DataTemplate>
 
     <DataTemplate  DataType="{x:Type behavior:SequenceViewModel}">
-        <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource nodeBox}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
+        <DockPanel>
+            <Button DockPanel.Dock="Bottom" HorizontalAlignment="Center"  Command="{Binding Create}" ContextMenu="{Binding ContextMenu}"  Template="{StaticResource AddButton}"/>
+            <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource nodeBox}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DockPanel>
     </DataTemplate>
 
 
     <DataTemplate DataType="{x:Type behavior:InverterViewModel}">
-        <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"  />
+        <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
+
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type behavior:DecoratorViewModel}">
-        <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"  />
+        <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
+
     </DataTemplate>
 
     <DataTemplate  DataType="{x:Type behavior:NodeViewModel}">
@@ -103,10 +134,10 @@
     <DataTemplate x:Key="behaviortreeEditor" DataType="{x:Type local:BehaviortreesEditorViewModel}">
         <DockPanel>
             <ToolBar DockPanel.Dock="Top">
-                <Button Content="New"/>
-                <Button Content="Cut"/>
-                <Button Content="Copy"/>
-                <Button Content="Paste"/>
+                <Button Content="Add" Command="{Binding AddBehaviortree}"/>
+                <Button Content="Remove" Command="{Binding RemoveBehaviortree}"/>
+                <Button Content="Load" Command="{Binding Load}"/>
+                <Button Content="Save" Command="{Binding Save}"/>
                 <ToggleButton Content="Play" IsChecked="{Binding Path=DataContext.World.Playing, RelativeSource={RelativeSource AncestorLevel=1, Mode=FindAncestor, AncestorType={x:Type TabControl}},Mode=TwoWay}"
                               />
 
@@ -212,10 +243,12 @@
                                   HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Auto"
                                   >
+                    <Canvas>
                     <ContentControl
                         Margin="10"
                         ContentTemplate="{StaticResource nodeBox}"
                         Content="{Binding Current.TreeRoot}"  />
+                    </Canvas>
 
 
                     <!--

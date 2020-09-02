@@ -75,6 +75,32 @@ namespace Prototype
         }
     }
 
+    [Node]
+    class StackEmpty : Node
+    {
+
+    }
+    [Node]
+    class StackPush : Node
+    {
+
+    }
+    [Node]
+    class StackPop : Node
+    {
+
+    }
+    [Node]
+    class ChangeVariable : Node
+    {
+        public string Operation { set; get; }
+    }
+    [Node]
+    class CompareVariable : Node
+    {
+
+    }
+
 
     [Node]
     class HasSelection : Node
