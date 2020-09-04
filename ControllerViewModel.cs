@@ -9,9 +9,10 @@ namespace Prototype
 {
     public class ControllerViewModel : ViewModelBase<Controller>
     {
-        public ControllerViewModel()
+        public ControllerViewModel(Controller model)
         {
-            Model = new SharpDX.XInput.Controller(UserIndex.One);
+            Model = model;
+
             isConnected = Model.IsConnected;
         }
 

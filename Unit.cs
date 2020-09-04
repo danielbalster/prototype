@@ -79,6 +79,8 @@ namespace Prototype
         {
             Behavior = null;
             World = null;
+            blackboard.Dispose();
+            blackboard = null;
         }
     }
 }

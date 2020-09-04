@@ -5,9 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Prototype"
         xmlns:behavior="clr-namespace:Prototype.Behaviortree"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d">
 
     <local:NodeTemplateSelector x:Key="nodeTemplateSelector"/>
+
+    <ObjectDataProvider x:Key="selectionModesEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="local:SelectionModes"/>
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+
 
     <Style x:Key="nodeBorderStyle" TargetType="Border">
         <Setter Property="BorderThickness" Value="1"/>
@@ -58,7 +66,67 @@
 
     </DataTemplate>
 
-    
+
+
+    <DataTemplate DataType="{x:Type local:ButtonPressedViewModel}">
+        <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+            <TextBlock DockPanel.Dock="Left" Text="Buttons:"/>
+            <TextBox Text="{Binding Buttons}"/>
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:TestSelectionModeViewModel}">
+        <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+            <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource selectionModesEnum}}"
+                          SelectedItem="{Binding Path=SelectionMode, Mode=TwoWay}" />
+
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:SetSelectionModeViewModel}">
+        <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+            <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource selectionModesEnum}}"
+                          SelectedItem="{Binding Path=SelectionMode, Mode=TwoWay}" />
+
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:ChangeVariableViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Row="0" Grid.Column="0" Text="Key:"/>
+            <TextBox Grid.Row="0" Grid.Column="1"  Text="{Binding Key}"/>
+            <TextBlock  Grid.Row="1" Grid.Column="0" Text="Value:"/>
+            <TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding Value}"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:SelectUnitsViewModel}"/>
+    <DataTemplate DataType="{x:Type local:UnselectUnitsViewModel}"/>
+
+    <DataTemplate DataType="{x:Type local:CompareVariableViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Row="0" Grid.Column="0" Text="Key:"/>
+            <TextBox Grid.Row="0" Grid.Column="1"  Text="{Binding Key}"/>
+            <TextBlock  Grid.Row="1" Grid.Column="0" Text="Value:"/>
+            <TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding Value}"/>
+        </Grid>
+    </DataTemplate>
 
     <DataTemplate DataType="{x:Type behavior:DelayViewModel}">
         <StackPanel Orientation="Vertical" >
@@ -176,29 +244,29 @@
                         <DataTemplate>
                             <Grid Margin="0,2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                                <TextBox Grid.Column="0" Text="{Binding Name, Mode=TwoWay}"/>
                                 <!--
                         <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource unitTypesEnum}}"
                             SelectedItem="{Binding Path=Type, Mode=TwoWay}" />
-                        -->
+                                -->
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
                 <DockPanel Grid.Row="0" Grid.RowSpan="3"  Grid.Column="4">
                     <DockPanel DockPanel.Dock="Top">
-                        <TextBlock DockPanel.Dock="Left">Unit:</TextBlock>
+                        <TextBlock DockPanel.Dock="Left">BB:</TextBlock>
                         <ComboBox 
                               DisplayMemberPath="Id"
-                              SelectedValue="{Binding SelectedUnit, Mode=TwoWay}"
-                              ItemsSource="{Binding Path=DataContext.World.Units, RelativeSource={RelativeSource AncestorLevel=1, Mode=FindAncestor, AncestorType={x:Type TabControl}}}"
+                              SelectedValue="{Binding SelectedBlackboard, Mode=TwoWay}"
+                              ItemsSource="{Binding Blackboards}"
                               />
                     </DockPanel>
                     <ListView 
-                        ItemsSource="{Binding SelectedUnit.Blackboard.Entries}"
+                        ItemsSource="{Binding SelectedBlackboard.Entries}"
                              >
 
                         <ListView.View >

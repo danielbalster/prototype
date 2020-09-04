@@ -12,8 +12,9 @@
         WindowStartupLocation="CenterScreen"
     >
     <Window.Resources>
+        <local:EnumBooleanConverter x:Key="enumBooleanConverter"/>
         
-    <ControlTemplate x:Key="group" TargetType="ItemsControl">
+        <ControlTemplate x:Key="group" TargetType="ItemsControl">
         <Expander Header="{TemplateBinding ItemStringFormat}" IsExpanded="True" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}">
             <Border Margin="2" BorderThickness="1" CornerRadius="5" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <ItemsPresenter Margin="4"/>
@@ -51,15 +52,16 @@
                 </Grid.RowDefinitions>
 
                 <ItemsControl Grid.Row="0" Template="{StaticResource group}" ItemStringFormat="Selection Cursor" >
-                    <RadioButton x:Name="cb_crosshair" Content="2D Crosshair" IsChecked="True"/>
-                    <RadioButton x:Name="cb_selectioncircle" Content="Screenspace Circle" IsChecked="False"/>
-                    <RadioButton x:Name="cb_wscircle" Content="Worldspace Cylinder" IsChecked="False"/>
-                    <RadioButton x:Name="cb_custom" Content="Off" IsChecked="False"/>
+                    <DockPanel>
+                        <TextBlock Width="100" >Selection</TextBlock>
+                        <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource selectionModesEnum}}"
+                          SelectedItem="{Binding Path=World.SelectionMode, Mode=TwoWay}" />
+                    </DockPanel>
 
                     <DockPanel>
                         <TextBlock Width="100" >Hittest</TextBlock>
                         <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource hitTestModesEnum}}"
-                          SelectedItem="{Binding Path=HitTestMode, Mode=TwoWay}" />
+                          SelectedItem="{Binding Path=World.HitTestMode, Mode=TwoWay}" />
                     </DockPanel>
 
                     <DockPanel>
@@ -194,7 +196,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsChecked,ElementName=cb_crosshair}" Value="False">
+                                <DataTrigger Binding="{Binding Path=World.SelectionMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Crosshair}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -214,7 +216,7 @@
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsChecked,ElementName=cb_selectioncircle}" Value="False">
+                            <DataTrigger Binding="{Binding Path=World.SelectionMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Circle}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
                         </Style.Triggers>

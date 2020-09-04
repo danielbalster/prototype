@@ -9,6 +9,7 @@ namespace Prototype.Behaviortree
     [Node]
     public class Print : Node
     {
+        [Property]
         public string Text { get; set; } = "empty";
 
         protected override Status OnExecute(Blackboard bb)

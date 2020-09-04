@@ -39,6 +39,11 @@ namespace Prototype
 
         }
 
+        public Guid Id
+        {
+            get => Model.Id;
+        }
+
         public void Sync()
         {
             foreach ( var de in Model.store )

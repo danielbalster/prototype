@@ -18,7 +18,7 @@ using System.Windows.Threading;
 using System.Collections.Specialized;
 using System.Windows.Media.Media3D;
 using SharpDX.XInput;
-
+using Prototype.Behaviortree;
 
 namespace Prototype
 {
@@ -28,6 +28,15 @@ namespace Prototype
         Center,
         Partial
     }
+
+    public enum SelectionModes
+    {
+        None,
+        Crosshair,
+        Circle,
+        Cylinder,
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -41,12 +50,17 @@ namespace Prototype
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Controller = new ControllerViewModel();
+            Controller = new ControllerViewModel(new SharpDX.XInput.Controller(UserIndex.One));
             World = new WorldViewModel(world);
             UnitsEditor = new UnitsEditorViewModel(world);
             BehaviortreesEditor = new BehaviortreesEditorViewModel(world);
             Camera = new CameraViewModel { Model = camera };
             Camera.AspectRatio = Viewport.ActualWidth / Viewport.ActualHeight;
+
+            // input behavior tree
+            blackboard.Set(Guid.Empty, "controller", Controller);
+            blackboard.Set(Guid.Empty, "camera", Camera);
+            blackboard.Set(Guid.Empty, "world", World); // third C of 3C: characters (in world)
 
             world.Init();
             DataContext = this;
@@ -79,7 +93,6 @@ namespace Prototype
 
             });
 
-
             return HitTestResultBehavior.Stop;
         }
 
@@ -95,6 +108,8 @@ namespace Prototype
         }
 
         World world = new World();
+
+        Blackboard blackboard = new Blackboard();
 
         public WorldViewModel World
         {
@@ -117,9 +132,8 @@ namespace Prototype
             set;
         }
 
-        public HitTestModes HitTestMode { get; set; }
-
         public CameraViewModel Camera { get; set; }
+        public Blackboard Blackboard { get => blackboard; set => blackboard = value; }
 
         void CheckButton(Image image, GamepadButtonFlags bits, GamepadButtonFlags last, GamepadButtonFlags now)
         {
@@ -128,6 +142,7 @@ namespace Prototype
                 image.Visibility = ((now & bits) == bits) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+
         void DisplayController()
         {
 
@@ -196,43 +211,45 @@ namespace Prototype
                     Rect bounds = transform.TransformBounds(VisualTreeHelper.GetDescendantBounds(uvm.ModelVisual3D));
                     if (!bounds.IsEmpty)
                     {
-                        if (cb_crosshair.IsChecked.Value)
+                        switch (World.SelectionMode)
                         {
-                            selected = (bounds.Contains(crosshair));
-                        }
-                        if (cb_selectioncircle.IsChecked.Value)
-                        {
-                            switch(HitTestMode)
-                            {
-                                case HitTestModes.Full:
-                                    selected = Helper.InsideCircle(bounds, crosshair, sl_size.Value / 2);
-                                    break;
-                                case HitTestModes.Center:
-                                    var center = new Point(bounds.Left + bounds.Width / 2, bounds.Top+bounds.Height / 2);
-                                    selected = (center - crosshair).Length < (sl_size.Value / 2);
-                                    break;
-                                case HitTestModes.Partial:
-                                    selected = Helper.TouchesCircle(bounds, crosshair, sl_size.Value / 2);
-                                    break;
-                            }
-                        }
-                        if (cb_wscircle.IsChecked.Value)
-                        {
-                            var agentRadius = 1;
-                            var extend = 0;
-                            switch (HitTestMode)
-                            {
-                                case HitTestModes.Full:
-                                    extend = +agentRadius;
-                                    break;
-                                case HitTestModes.Center:
-                                    break;
-                                case HitTestModes.Partial:
-                                    extend = -agentRadius;
-                                    break;
-                            }
+                            case SelectionModes.Crosshair:
+                                selected = (bounds.Contains(crosshair));
+                                break;
+                            case SelectionModes.Circle:
+                                switch (World.HitTestMode)
+                                {
+                                    case HitTestModes.Full:
+                                        selected = Helper.InsideCircle(bounds, crosshair, sl_size.Value / 2);
+                                        break;
+                                    case HitTestModes.Center:
+                                        var center = new Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
+                                        selected = (center - crosshair).Length < (sl_size.Value / 2);
+                                        break;
+                                    case HitTestModes.Partial:
+                                        selected = Helper.TouchesCircle(bounds, crosshair, sl_size.Value / 2);
+                                        break;
+                                }
+                                break;
+                            case SelectionModes.Cylinder:
+                                {
+                                    var agentRadius = 1;
+                                    var extend = 0;
+                                    switch (World.HitTestMode)
+                                    {
+                                        case HitTestModes.Full:
+                                            extend = +agentRadius;
+                                            break;
+                                        case HitTestModes.Center:
+                                            break;
+                                        case HitTestModes.Partial:
+                                            extend = -agentRadius;
+                                            break;
+                                    }
 
-                            selected = ((uvm.Position - Camera.Position).Length+extend) < (sl_size.Value/20);
+                                    selected = ((uvm.Position - Camera.Position).Length + extend) < (sl_size.Value / 20);
+                                }
+                                break;
                         }
 
                         if (cb_showbounds.IsChecked.Value)
@@ -261,12 +278,21 @@ namespace Prototype
             }
 
             // the 1/20 scale of the sl_size value is purely cosmetic, no reason behind it.
-            if (cb_wscircle.IsChecked.Value)
+            if (World.SelectionMode==SelectionModes.Cylinder)
             {
                 var trans = new TranslateTransform3D(Camera.Position.X, 0, Camera.Position.Y);
                 var scale = new ScaleTransform3D(new Vector3D(sl_size.Value / 20, 1, sl_size.Value / 20));
                 selectionCylinder.Transform = new Transform3DGroup { Children = { scale, trans } };
                 Models.Children.Add(selectionCylinder);
+            }
+
+
+            // input behavior execution
+
+            var bt = World.Model.FindBehaviortreeByName("3C");
+            if (bt != null)
+            {
+                bt.Execute(blackboard);
             }
         }
 

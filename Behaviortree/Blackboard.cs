@@ -1,10 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Prototype.Behaviortree
 {
-    public class Blackboard
+    public class Blackboard : IDisposable
     {
+        static public ObservableCollection<Blackboard> Instances { get; private set; } = new ObservableCollection<Blackboard>();
+        public Blackboard()
+        {
+            Instances.Add(this);
+        }
+
+        public void Dispose()
+        {
+            Instances.Remove(this);
+        }
+
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public Dictionary<Tuple<Guid,string>,object> store = new Dictionary<Tuple<Guid, string>, object>();
 
         public bool Get(Guid nodeScope, string key, out object value)
@@ -32,6 +46,5 @@ namespace Prototype.Behaviortree
         {
             store.Remove(new Tuple<Guid, string>( nodeScope, key));
         }
-
     }
 }

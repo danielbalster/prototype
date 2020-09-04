@@ -47,6 +47,34 @@ namespace Prototype
             Model.Update(Playing);
         }
 
+        SelectionModes selectionMode = SelectionModes.Crosshair;
+        public SelectionModes SelectionMode
+        {
+            get => selectionMode;
+            set
+            {
+                if (selectionMode != value)
+                {
+                    selectionMode = value;
+                    RaisePropertyChanged("SelectionMode");
+                }
+            }
+        }
+
+        HitTestModes hitTestMode = HitTestModes.Partial;
+        public HitTestModes HitTestMode
+        {
+            get => hitTestMode;
+            set
+            {
+                if (hitTestMode != value)
+                {
+                    hitTestMode = value;
+                    RaisePropertyChanged("HitTestMode");
+                }
+            }
+        }
+
         private bool playing = false;
         public bool Playing
         {

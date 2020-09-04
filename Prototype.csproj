@@ -67,6 +67,9 @@
     <Compile Include="Behaviortree\Failer.cs" />
     <Compile Include="Behaviortree\Succeeder.cs" />
     <Compile Include="BlackboardViewModel.cs" />
+    <Compile Include="EnumBooleanConverter.cs" />
+    <Compile Include="InputBehaviortreeNodes.cs" />
+    <Compile Include="NodeFactory.cs" />
     <Compile Include="NodeTemplateSelector.cs" />
     <Compile Include="NodeViewModel.cs" />
     <Compile Include="BehaviortreeViewModel.cs" />

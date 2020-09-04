@@ -15,16 +15,18 @@ namespace Prototype.Behaviortree
         Many,
     }
 
-    public interface INode : ICollection, IList
+    public interface INode : ICollection<INode>, IList
     {
-        Guid Id { get; }
+        Guid Id { get; set; }
         string Name { get; }
         Status Execute(Blackboard bb);
+        
+        //ClearItems, InsertItem, SetItem und RemoveItem.
     }
 
     public class Node : ObservableCollection<INode>, INode
     {
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public virtual AmountType AmountChildren { get => AmountType.None; }
 

@@ -52,6 +52,7 @@ namespace Prototype
             {
                 Model.World.PendingActions.Add((world) => {
                     world.Units.Remove(Model);
+                    Model.Dispose();
                 });
             }
         }

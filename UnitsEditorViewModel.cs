@@ -113,6 +113,7 @@ namespace Prototype
             foreach (var unit in Model.Units.Where(a => a.Selected).ToList())
             {
                 Model.Units.Remove(unit);
+                unit.Dispose();
             }
         }
         private void clearUnits()

@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Xml.Serialization;
+
 namespace Prototype.Behaviortree
 {
+    //[XmlElement("Behaviortree")]
     public class Behaviortree
     {
         public INode Root = null;

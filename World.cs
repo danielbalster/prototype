@@ -69,7 +69,11 @@ namespace Prototype
 
         public Behaviortree.Behaviortree FindBehaviortreeByName(string key)
         {
-            return Behaviortrees.Single(s => s.Name == key);
+            foreach( var e in Behaviortrees )
+            {
+                if (e.Name == key) return e;
+            }
+            return null;
         }
 
         public void Init()
