@@ -80,7 +80,14 @@ namespace Prototype
             if (rayMeshResult == null) return HitTestResultBehavior.Continue;
             GeometryModel3D hitgeo = rayMeshResult.ModelHit as GeometryModel3D;
 
-            if (!(hitgeo == planeOdd || hitgeo == planeEven)) return HitTestResultBehavior.Continue;
+            if (!(hitgeo == planeOdd || hitgeo == planeEven))
+            {
+                return HitTestResultBehavior.Continue;
+            }
+
+            //World.TargetPosition = new Vector(rayResult.PointHit.X, rayResult.PointHit.Z);
+
+            
 
             var unit = new Unit { World = World.Model };
             unit.Position = new Vector(rayResult.PointHit.X, rayResult.PointHit.Z); ;
@@ -92,6 +99,8 @@ namespace Prototype
                 world.Units.Add(unit);
 
             });
+
+            
 
             return HitTestResultBehavior.Stop;
         }
@@ -176,8 +185,16 @@ namespace Prototype
             blk.Opacity = 0.2;
             cyl.Material = cyl.BackMaterial = new DiffuseMaterial { Brush = blk };
             selectionCylinder = new ModelVisual3D { Content = cyl };
+
+            cyl = new GeometryModel3D();
+            cyl.Geometry = MeshFactory.CreateCylinder(2, 0.1, 36);
+            var red = new SolidColorBrush(Colors.Red);
+            red.Opacity = 0.5;
+            cyl.Material = cyl.BackMaterial = new DiffuseMaterial { Brush = red };
+            wsCursor = new ModelVisual3D { Content = cyl };
         }
         ModelVisual3D selectionCylinder;
+        ModelVisual3D wsCursor;
         GeometryModel3D planeOdd;
         GeometryModel3D planeEven;
 
@@ -286,6 +303,11 @@ namespace Prototype
                 Models.Children.Add(selectionCylinder);
             }
 
+            if (World.ShowTarget)
+            {
+                wsCursor.Transform = new TranslateTransform3D(World.TargetPosition.X, 0.1, World.TargetPosition.Y);
+                Models.Children.Add(wsCursor);
+            }
 
             // input behavior execution
 

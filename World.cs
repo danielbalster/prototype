@@ -23,6 +23,11 @@ namespace Prototype
             get;set;
         }
 
+        public Vector TargetPosition
+        {
+            get;set;
+        }
+
         public Unit Find(Predicate<Unit> predicate)
         {
             foreach( var unit in Units )

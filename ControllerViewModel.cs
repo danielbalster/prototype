@@ -28,14 +28,36 @@ namespace Prototype
                 if (isConnected != value)
                 {
                     isConnected = value;
+                    if (isConnected)
+                    {
+                        current = Model.GetState();
+                        changedButtons = GamepadButtonFlags.None;
+                    }
                     RaisePropertyChanged("IsConnected");
                 }
             }
         }
 
+        State current;
+        GamepadButtonFlags changedButtons;
+
         internal void Update()
         {
             IsConnected = Model.IsConnected;
+            if (!IsConnected) return;
+            var next = Model.GetState();
+            changedButtons = current.Gamepad.Buttons ^ next.Gamepad.Buttons;
+            current = next;
+        }
+
+        public bool IsHeld(GamepadButtonFlags flags)
+        {
+            return IsConnected && (current.Gamepad.Buttons & flags) == flags;
+        }
+
+        public bool HasChanged(GamepadButtonFlags flags)
+        {
+            return IsConnected && (changedButtons & flags) == flags;
         }
     }
 }

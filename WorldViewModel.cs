@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Windows;
 
 namespace Prototype
 {
@@ -45,6 +46,25 @@ namespace Prototype
         internal void Update()
         {
             Model.Update(Playing);
+        }
+
+        public bool ShowTarget
+        {
+            get; set;
+        }
+        = false;
+
+        public Vector TargetPosition
+        {
+            get => Model.TargetPosition;
+            set
+            {
+                if (Model.TargetPosition != value)
+                {
+                    Model.TargetPosition = value;
+                    RaisePropertyChanged("TargetPosition");
+                }
+            }
         }
 
         SelectionModes selectionMode = SelectionModes.Crosshair;

@@ -73,6 +73,27 @@ namespace Prototype.Behaviortree
                     Parent.Remove(this);
             });
 
+            Copy = new RelayCommand(arg =>
+            {
+                var xml = NodeSerializer.save(this.Model);
+                Clipboard.SetText(xml);
+            });
+            Paste = new RelayCommand(arg =>
+            {
+                var txt = Clipboard.GetText();
+                var root = NodeSerializer.load(txt);
+                if (root != null)
+                this.Model.Add(root);
+            });
+            Cut = new RelayCommand(arg =>
+            {
+                var xml = NodeSerializer.save(this.Model);
+                Clipboard.SetText(xml);
+                if (Parent != null)
+                    Parent.Remove(this);
+
+            });
+
             Create = new RelayCommand(arg =>
             {
                 ContextMenu.Items.Clear();
@@ -110,6 +131,9 @@ namespace Prototype.Behaviortree
 
         public ICommand Delete { get; private set; }
         public ICommand Create { get; private set; }
+        public ICommand Cut { get; private set; }
+        public ICommand Copy { get; private set; }
+        public ICommand Paste { get; private set; }
 
         private void Model_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -295,6 +319,14 @@ namespace Prototype.Behaviortree
     public class FindTargetViewModel : NodeViewModelBase<FindTarget>
     {
         public FindTargetViewModel(FindTarget model) : base(model)
+        {
+        }
+    }
+
+    [Model(Type = typeof(SetTarget))]
+    public class SetTargetViewModel : NodeViewModelBase<SetTarget>
+    {
+        public SetTargetViewModel(SetTarget model) : base(model)
         {
         }
     }

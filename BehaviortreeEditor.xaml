@@ -52,26 +52,52 @@
     </Style>
 
     <DataTemplate x:Key="nodeBox" DataType="{x:Type behavior:NodeViewModel}">
-        <Border Style="{StaticResource nodeBorderStyle}" Padding="2" >
+        <Border Style="{StaticResource nodeBorderStyle}" Padding="2" 
+                >
+            <Border.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Cut" Command="{Binding Cut}"/>
+                    <MenuItem Header="Copy" Command="{Binding Copy}"/>
+                    <MenuItem Header="Paste" Command="{Binding Paste}"/>
+                </ContextMenu>
+            </Border.ContextMenu>
             <Expander IsExpanded="True" Template="{StaticResource ExpanderControlTemplate}">
                 <Expander.Header>
                     <DockPanel>
                         <Button Command="{Binding Delete}" DockPanel.Dock="Right" Margin="4 0 0 0" Template="{StaticResource XButton}"/>
-                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
                     </DockPanel>
                 </Expander.Header>
                 <ContentControl Style="{StaticResource ccStyle}" Content="{Binding}"  />
+                <!--
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}">
+                        <TextBlock MaxWidth="100" TextAlignment="Justify">This is a comment with many many characters and is fully optional</TextBlock>
+                    </Border>
+                </DockPanel>
+                -->
             </Expander>
         </Border>
-
     </DataTemplate>
 
-
-
-    <DataTemplate DataType="{x:Type local:ButtonPressedViewModel}">
+    <DataTemplate DataType="{x:Type local:AreButtonsHeldViewModel}">
         <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
             <TextBlock DockPanel.Dock="Left" Text="Buttons:"/>
             <TextBox Text="{Binding Buttons}"/>
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:HaveButtonsChangedViewModel}">
+        <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+            <TextBlock DockPanel.Dock="Left" Text="Buttons:"/>
+            <TextBox Text="{Binding Buttons}"/>
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:SetBehaviorViewModel}">
+        <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
+            <TextBlock DockPanel.Dock="Left" Text="Behavior:"/>
+            <TextBox Text="{Binding Behavior}"/>
         </DockPanel>
     </DataTemplate>
 
@@ -79,7 +105,6 @@
         <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
             <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource selectionModesEnum}}"
                           SelectedItem="{Binding Path=SelectionMode, Mode=TwoWay}" />
-
         </DockPanel>
     </DataTemplate>
 
@@ -87,7 +112,6 @@
         <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
             <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Source={StaticResource selectionModesEnum}}"
                           SelectedItem="{Binding Path=SelectionMode, Mode=TwoWay}" />
-
         </DockPanel>
     </DataTemplate>
 
@@ -109,6 +133,7 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type local:SelectUnitsViewModel}"/>
+    
     <DataTemplate DataType="{x:Type local:UnselectUnitsViewModel}"/>
 
     <DataTemplate DataType="{x:Type local:CompareVariableViewModel}">
@@ -127,6 +152,24 @@
             <TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding Value}"/>
         </Grid>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:ShowTargetCursorViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Row="0" Grid.Column="0" Text="Enabled:"/>
+            <TextBox Grid.Row="0" Grid.Column="1"  Text="{Binding Enabled}"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:SetTargetHereViewModel}"/>
+
 
     <DataTemplate DataType="{x:Type behavior:DelayViewModel}">
         <StackPanel Orientation="Vertical" >
@@ -175,7 +218,6 @@
 
     <DataTemplate DataType="{x:Type behavior:InverterViewModel}">
         <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
-
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type behavior:DecoratorViewModel}">
@@ -184,17 +226,25 @@
 
     <DataTemplate  DataType="{x:Type behavior:NodeViewModel}">
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:MoveToViewModel}">
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:HasTargetViewModel}">
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:FindTargetViewModel}">
     </DataTemplate>
 
+    <DataTemplate  DataType="{x:Type behavior:SetTargetViewModel}">
+    </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:SucceederViewModel}">
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:FailerViewModel}">
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:RepeaterViewModel}">
         <StackPanel Orientation="Vertical" >
             <DockPanel MinWidth="100" HorizontalAlignment="Stretch">
@@ -204,6 +254,7 @@
             <ContentControl Style="{StaticResource ccStyle}" ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}" />
         </StackPanel>
     </DataTemplate>
+    
     <DataTemplate  DataType="{x:Type behavior:RepeatUntilFailViewModel}">
         <ContentControl ContentTemplate="{StaticResource nodeBox}" Content="{Binding Children[0]}"/>
     </DataTemplate>
@@ -300,12 +351,12 @@
                                   HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Auto"
                                   >
-                    <Canvas>
+                    <WrapPanel>
                         <ContentControl
                             Margin="10"
                             ContentTemplate="{StaticResource nodeBox}"
                             Content="{Binding Current.TreeRoot}"  />
-                    </Canvas>
+                    </WrapPanel>
                 </ScrollViewer>
             </Grid>
         </DockPanel>

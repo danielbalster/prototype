@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX.XInput;
+using System.Windows;
 
 namespace Prototype
 {
@@ -109,32 +110,20 @@ namespace Prototype
     }
 
 
-    [Node]
-    public class ButtonPressed : Node
+    public class ControllerNode : Node
     {
         [Property]
         public int Buttons { get; set; }
 
-        protected override Status OnExecute(Blackboard bb)
-        {
-            if (!bb.Get(Guid.Empty, "controller", out ControllerViewModel cvm)) return Status.Error;
-            if (!cvm.IsConnected) return Status.Error;
-            var s = cvm.Model.GetState();
-            if ((((int)s.Gamepad.Buttons) & Buttons) == Buttons)
-                return Status.Success;
-
-
-            return Status.Failure;
-        }
     }
-    [Model(Type = typeof(ButtonPressed))]
-    public class ButtonPressedViewModel : NodeViewModelBase<ButtonPressed>
+    [Model(Type = typeof(ControllerNode))]
+    public class ControllerNodeViewModel : NodeViewModelBase<ControllerNode>
     {
         public string Buttons
         {
             get
             {
-                var bits = (GamepadButtonFlags) Model.Buttons;
+                var bits = (GamepadButtonFlags)Model.Buttons;
                 var sb = new StringBuilder();
                 if (bits.HasFlag(GamepadButtonFlags.A)) sb.Append("A ");
                 if (bits.HasFlag(GamepadButtonFlags.B)) sb.Append("B ");
@@ -149,7 +138,7 @@ namespace Prototype
                 if (bits.HasFlag(GamepadButtonFlags.DPadLeft)) sb.Append("LEFT ");
                 if (bits.HasFlag(GamepadButtonFlags.DPadRight)) sb.Append("RIGHT ");
                 if (bits.HasFlag(GamepadButtonFlags.Start)) sb.Append("START ");
-                if (bits.HasFlag( GamepadButtonFlags.Back)) sb.Append("BACK ");
+                if (bits.HasFlag(GamepadButtonFlags.Back)) sb.Append("BACK ");
                 return sb.ToString();
             }
             set
@@ -179,10 +168,58 @@ namespace Prototype
             }
         }
 
-        public ButtonPressedViewModel(ButtonPressed model) : base(model)
+        public ControllerNodeViewModel(ControllerNode model) : base(model)
         {
         }
     }
+
+    [Node]
+    public class AreButtonsHeld : ControllerNode
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "controller", out ControllerViewModel cvm)) return Status.Error;
+            if (!cvm.IsConnected) return Status.Error;
+
+            if (cvm.IsHeld((GamepadButtonFlags)Buttons))
+                return Status.Success;
+
+            return Status.Failure;
+        }
+    }
+    [Model(Type = typeof(AreButtonsHeld))]
+    public class AreButtonsHeldViewModel : ControllerNodeViewModel
+    {
+        public AreButtonsHeldViewModel(AreButtonsHeld model) : base(model)
+        {
+        }
+    }
+
+    [Node]
+    public class HaveButtonsChanged : ControllerNode
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "controller", out ControllerViewModel cvm)) return Status.Error;
+            if (!cvm.IsConnected) return Status.Error;
+
+            if (cvm.HasChanged((GamepadButtonFlags)Buttons) && cvm.IsHeld((GamepadButtonFlags)Buttons))
+                return Status.Success;
+
+            return Status.Failure;
+        }
+    }
+    [Model(Type = typeof(HaveButtonsChanged))]
+    public class HaveButtonsChangedViewModel : ControllerNodeViewModel
+    {
+        public HaveButtonsChangedViewModel(HaveButtonsChanged model) : base(model)
+        {
+        }
+    }
+
+
+
+
 
     [Node]
     public class HasSelection : Node
@@ -325,6 +362,105 @@ namespace Prototype
         {
         }
     }
+
+
+    [Node]
+    public class ShowTargetCursor : Node
+    {
+        [Property]
+        public bool Enabled { set; get; }
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+
+            world.ShowTarget = Enabled;
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(ShowTargetCursor))]
+    public class ShowTargetCursorViewModel : NodeViewModelBase<ShowTargetCursor>
+    {
+        #region Enabled
+        public bool Enabled
+        {
+            get => Model.Enabled;
+            set
+            {
+                if (Model.Enabled != value)
+                {
+                    Model.Enabled = value;
+                    RaisePropertyChanged("Enabled");
+                }
+            }
+        }
+        #endregion
+        public ShowTargetCursorViewModel(ShowTargetCursor model) : base(model)
+        {
+        }
+    }
+
+    [Node]
+    public class SetTargetHere : Node
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+            if (!bb.Get(Guid.Empty, "camera", out CameraViewModel camera)) return Status.Error;
+            world.TargetPosition = camera.Position;
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(SetTargetHere))]
+    public class SetTargetHereViewModel : NodeViewModelBase<SetTargetHere>
+    {
+        public SetTargetHereViewModel(SetTargetHere model) : base(model)
+        {
+        }
+    }
+
+
+    [Node]
+    public class SetBehavior : Node
+    {
+        [Property]
+        public string Behavior { get; set; }
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+
+            var behavior = world.Model.FindBehaviortreeByName(Behavior);
+            if (behavior == null) return Status.Error;
+
+            foreach (var unit in world.Units)
+            {
+                if (unit.Selected) unit.Model.Behavior = behavior;
+            }
+
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(SetBehavior))]
+    public class SetBehaviorViewModel : NodeViewModelBase<SetBehavior>
+    {
+        #region Behavior
+        public string Behavior
+        {
+            get => Model.Behavior;
+            set
+            {
+                if (Model.Behavior != value)
+                {
+                    Model.Behavior = value;
+                    RaisePropertyChanged("Behavior");
+                }
+            }
+        }
+        #endregion
+        public SetBehaviorViewModel(SetBehavior model) : base(model)
+        {
+        }
+    }
+
 
 
 }

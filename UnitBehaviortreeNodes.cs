@@ -16,10 +16,12 @@ using System.Windows;
 
 namespace Prototype
 {
+
+
     [Node]
     public class FindTarget : Node
     {
-        Random rng = new Random();
+        static Random rng = new Random();
         protected override Status OnExecute(Blackboard bb)
         {
             if (!bb.Get(Guid.Empty, "unit", out Unit unit)) return Status.Error;
@@ -29,6 +31,23 @@ namespace Prototype
             return Status.Success;
         }
     }
+
+    [Node]
+    public class SetTarget : Node
+    {
+        static Random rng = new Random();
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out World world)) return Status.Error;
+            
+            var r = Helper.DegreesToRadians * rng.Next(0, 360);
+            var p = new Vector(Math.Sin(r) * 10, Math.Cos(r) * 10);
+            bb.Set(Guid.Empty, "target", world.TargetPosition + p);
+            return Status.Success;
+        }
+    }
+
+
 
     [Node]
     public class HasTarget : Node

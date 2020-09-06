@@ -29,11 +29,11 @@ namespace Prototype
 
 
             Blackboard.Instances.CollectionChanged += Blackboards_CollectionChanged;
-            foreach( var bb in Blackboard.Instances)
+            foreach (var bb in Blackboard.Instances)
             {
                 Blackboards.Add(new BlackboardViewModel(bb));
             }
-            
+
 
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
@@ -45,7 +45,7 @@ namespace Prototype
                 }
             }
 
-            timer.Interval = new TimeSpan(0,0,0,0,100);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             timer.Tick += OnTimerTick;
             timer.Start();
 
@@ -77,6 +77,7 @@ namespace Prototype
                 }
             });
         }
+
         OpenFileDialog ofDialog = new OpenFileDialog();
         SaveFileDialog sfDialog = new SaveFileDialog();
 
@@ -103,6 +104,7 @@ namespace Prototype
                 {
                     var unit = new Unit();
                     unit.Behavior = Model.FindBehaviortreeByName(n.GetAttribute("behavior"));
+                    unit.World = Model;
                     unit.Position.X = double.Parse(n.GetAttribute("x"));
                     unit.Position.Y = double.Parse(n.GetAttribute("y"));
                     unit.Type = (UnitTypes) Enum.Parse(typeof(UnitTypes), n.GetAttribute("type"));
