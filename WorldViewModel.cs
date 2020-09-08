@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
@@ -65,6 +66,30 @@ namespace Prototype
                     RaisePropertyChanged("TargetPosition");
                 }
             }
+        }
+
+        public List<UnitViewModel> GetSelectedUnits()
+        {
+            var list = new List<UnitViewModel>();
+            foreach( var unit in Units )
+            {
+                if (unit.Selected) list.Add(unit);
+            }
+            return list;
+        }
+
+        public HashSet<Guid> GetSelectedGroupId()
+        {
+            var set = new HashSet<Guid>();
+            foreach (var unit in Units)
+            {
+                if (unit.Selected)
+                {
+                    if (unit.GroupId != Guid.Empty)
+                        set.Add(unit.GroupId);
+                }
+            }
+            return set;
         }
 
         SelectionModes selectionMode = SelectionModes.Crosshair;

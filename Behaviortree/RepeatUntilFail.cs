@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Prototype.Behaviortree
 {
-    [Node]
+    [Node(Path = "Basic/RepeatUntilFail")]
     public class RepeatUntilFail : Decorator
     {
         protected override Status OnExecute(Blackboard bb)

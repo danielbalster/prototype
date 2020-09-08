@@ -36,6 +36,7 @@ namespace Prototype.Behaviortree
         {
             public Type Type { get; set; }
             public INodeViewModel Node { get; set; }
+            public string Path { get; set; }
         }
 
         static Dictionary<string, NodeAttribute> NodeTypes = new Dictionary<string, NodeAttribute>();
@@ -99,8 +100,7 @@ namespace Prototype.Behaviortree
                 ContextMenu.Items.Clear();
                 foreach( var de in NodeTypes )
                 {
-                    var mi = new MenuItem();
-                    mi.Header = de.Key;
+                    var mi = CreateHierarchicalMenuItem(ContextMenu.Items, de.Value.Path.Split(new[]{ '/'}),0);
                     mi.Command = new RelayCommand((arg2) =>
                     {
                         var ca = arg2 as CreateArgs;
@@ -108,9 +108,7 @@ namespace Prototype.Behaviortree
                         var node = Activator.CreateInstance(ca.Type) as Prototype.Behaviortree.Node;
                         ca.Node.DataModel.Add(node);
                     });
-                    mi.CommandParameter = new CreateArgs { Type = de.Value.Type, Node = this};
-
-                    ContextMenu.Items.Add(mi);
+                    mi.CommandParameter = new CreateArgs { Type = de.Value.Type, Node = this };
                 }
                 ContextMenu.IsOpen = true;
 
@@ -118,6 +116,27 @@ namespace Prototype.Behaviortree
             });
 
             CheckEmpty();
+        }
+
+        MenuItem CreateHierarchicalMenuItem(ItemCollection collection, string[] path, int index)
+        {
+            MenuItem mi = null;
+            foreach( MenuItem c in collection )
+            {
+                if ((string)c.Header == path[index])
+                {
+                    mi = c;
+                    break;
+                }
+            }
+            if (mi == null)
+            {
+                mi = new MenuItem();
+                mi.Header = path[index];
+                collection.Add(mi);
+                if ((path.Length-1) == index) return mi;
+            }
+            return CreateHierarchicalMenuItem(mi.Items, path, index + 1);
         }
 
         public ContextMenu ContextMenu { get; set; } = new ContextMenu();

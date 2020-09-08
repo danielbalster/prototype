@@ -8,17 +8,17 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Collections.Specialized;
 using System.Windows.Input;
+using System.Windows.Threading;
+using System.Windows;
+using Prototype.Behaviortree;
 
 namespace Prototype
 {
-    public class UnitsEditorViewModel : ViewModelBase<World>
+    public class UnitsEditorViewModel : WorldViewModel
     {
-        public UnitsEditorViewModel(World model)
+        public UnitsEditorViewModel(World model) : base(model)
         {
             Model = model;
-
-            Units = new ObservableCollection<UnitViewModel>();
-            Model.Units.CollectionChanged += Units_CollectionChanged;
 
             AddRandom = new RelayCommand(param => addRandom());
             AddUniform = new RelayCommand(param => addUniform());
@@ -28,7 +28,21 @@ namespace Prototype
             RemoveSelected = new RelayCommand(param => removeSelected());
             AddSingle = new RelayCommand(param => addSingle());
 
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            timer.Tick += OnTimerTick;
+            timer.Start();
+
         }
+
+        private void OnTimerTick(object sender, EventArgs e)
+        {
+            foreach( var uvm in Units )
+            {
+                uvm.Sync();
+            }
+        }
+
+        DispatcherTimer timer = new DispatcherTimer();
 
         public ICommand ClearUnits { private set; get; }
         public ICommand AddRandom { private set; get; }
@@ -38,37 +52,9 @@ namespace Prototype
         public ICommand AddUniform { private set; get; }
         public ICommand RemoveSelected { private set; get; }
 
-        public ObservableCollection<UnitViewModel> Units { get; set; }
-
-        #region ViewModel Collection
-        private void Units_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (Unit unit in e.NewItems)
-                    {
-                        Units.Insert(e.NewStartingIndex, new UnitViewModel(unit));
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (Unit unit in e.OldItems)
-                    {
-                        Units.Remove(Units.Where(x => x.Model == unit).Single());
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    Units.Clear();
-                    break;
-            }
-        }
-        #endregion
-
         public UnitTypes UnitType { get; set; }
+
+        public BehaviortreeViewModel SelectedBehaviortree { get; set; }
 
         System.Random random = new System.Random();
         private void addRandom()
@@ -76,8 +62,7 @@ namespace Prototype
             //for (int i = 0; i < 100; ++i)
             {
                 var unit = new Unit { World = Model };
-                unit.Position.X = random.Next(-100, +100);
-                unit.Position.Y = random.Next(-100, +100);
+                unit.Position = new Vector(random.Next(-100, +100), random.Next(-100, +100));
                 unit.Selected = true;
                 unit.Type = UnitType;
                 unit.Behavior = Model.FindBehaviortreeByName("Random Mover");
@@ -90,22 +75,20 @@ namespace Prototype
                 for (int y = -10; y < 10; y++)
                 {
                     var unit = new Unit { World = Model };
-                    unit.Position.X = x*10;
-                unit.Position.Y = y*10;
-                unit.Selected = true;
+                    unit.Position = new Vector(x * 10, y * 10);
+                    unit.Selected = true;
                     unit.Type = UnitType;
                     unit.Behavior = null; //
                 Model.Units.Add(unit);
             }
         }
-
         private void addSingle()
         {
             var unit = new Unit { World = Model };
             unit.Position = Model.CameraPosition;
             unit.Selected = false;
             unit.Type = UnitType;
-            unit.Behavior = Model.FindBehaviortreeByName("Hello World Printer");
+            unit.Behavior = SelectedBehaviortree?.Model;
             Model.Units.Add(unit);
         }
         private void removeSelected()

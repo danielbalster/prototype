@@ -16,42 +16,31 @@
     <DataTemplate x:Key="unitsEditor" DataType="{x:Type local:UnitsEditorViewModel}">
         <DockPanel>
             <ToolBar DockPanel.Dock="Top">
-                <Button Content="New Unit" Height="20" Command="{Binding AddSingle}"/>
                 <Button Content="+100 Random" Height="20" Command="{Binding AddRandom}"/>
                 <Button Content="+100 Uniform" Height="20" Command="{Binding AddUniform}"/>
-
-                <ComboBox ItemsSource="{Binding Source={StaticResource unitTypesEnum}}"
-                                SelectedItem="{Binding Path=UnitType, Mode=TwoWay}" />
-
-
-                <Separator/>
-                <Button Content="Remove All" Height="20"  Command="{Binding ClearUnits}"/>
-                <Button Content="Remove Selected" Height="20"   Command="{Binding RemoveSelected}" />
-                <Separator/>
-                <Button Content="Select All" Height="20"   Command="{Binding SelectAll}" />
-                <Button Content="Select None" Height="20"   Command="{Binding SelectNone}" />
             </ToolBar>
-            <ListBox ItemsSource="{Binding Units}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox Grid.Column="0" Content="{Binding Path=Type}" IsChecked="{Binding Selected, Mode=TwoWay}"/>
-                            <!--
-                            <ComboBox Grid.Column="5" ItemsSource="{Binding Source={StaticResource unitTypesEnum}}"
-                                SelectedItem="{Binding Path=Type, Mode=TwoWay}" />
-                            -->
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+
+
+            <ListView ItemsSource="{Binding Units, Mode=TwoWay}"
+                VirtualizingPanel.IsContainerVirtualizable="True"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                      >
+                <ListView.View >
+                    <GridView >
+                        <GridViewColumn Header="Selected" Width="auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Type" Width="auto" DisplayMemberBinding="{Binding Type}"/>
+                        <GridViewColumn Header="GroupId" Width="auto" DisplayMemberBinding="{Binding GroupId}"/>
+                        <GridViewColumn Header="Behavior" Width="auto" DisplayMemberBinding="{Binding Behaviortree.Name}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
         </DockPanel>
     </DataTemplate>

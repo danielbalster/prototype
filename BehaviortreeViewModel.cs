@@ -48,7 +48,8 @@ namespace Prototype
         {
             get
             {
-                return Model.Name;
+                if (Model!=null) return Model.Name;
+                return "(null)";
             }
             set
             {

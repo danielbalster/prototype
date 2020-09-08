@@ -24,12 +24,12 @@ namespace Prototype
             }
         }
 
-        public static ViewModel Create(object model)
+        public static Notifier Create(object model)
         {
             var type = model.GetType();
             if (!creators.TryGetValue(type, out Type value))
                 return null;
-            return (ViewModel) Activator.CreateInstance(value, model);
+            return (Notifier) Activator.CreateInstance(value, model);
         }
     }
 }

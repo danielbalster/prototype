@@ -9,7 +9,7 @@ using System.Windows.Threading;
 
 namespace Prototype
 {
-    public class BlackboardEntry : ViewModel
+    public class BlackboardEntry : Notifier
     {
         private object value;
         public Guid Id { get; set; }
@@ -48,7 +48,7 @@ namespace Prototype
         {
             foreach ( var de in Model.store )
             {
-                if ("$#?!".Contains(de.Key.Item2)) continue;
+                if (de.Key.Item2==null || "$#?!".Contains(de.Key.Item2)) continue;
                 var found = false;
                 foreach( var e in Entries )
                 {

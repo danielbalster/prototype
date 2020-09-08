@@ -1,6 +1,6 @@
 ﻿namespace Prototype.Behaviortree
 {
-    [Node]
+    [Node(Path="Basic/Decorator")]
     public class Decorator : Node
     {
         public override AmountType AmountChildren { get => AmountType.One; }

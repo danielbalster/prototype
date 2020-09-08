@@ -18,7 +18,7 @@ namespace Prototype
 {
 
 
-    [Node]
+    [Node(Path = "Unit/FindTarget")]
     public class FindTarget : Node
     {
         static Random rng = new Random();
@@ -32,7 +32,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Unit/SetTarget")]
     public class SetTarget : Node
     {
         static Random rng = new Random();
@@ -47,9 +47,7 @@ namespace Prototype
         }
     }
 
-
-
-    [Node]
+    [Node(Path = "Unit/HasTarget")]
     public class HasTarget : Node
     {
         protected override Status OnExecute(Blackboard bb)
@@ -62,7 +60,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Unit/MoveTo")]
     public class MoveTo : Node
     {
         protected override void OnOpen(Blackboard bb)
@@ -70,10 +68,10 @@ namespace Prototype
             if (!bb.Get(Guid.Empty, "unit", out Unit unit)) return;
             if (!bb.Get( Guid.Empty, "target", out Vector target)) return;
 
-            var delta = target- unit.Position;
+            var delta = target - unit.Position;
             delta.Normalize();
 
-            bb.Set( Id, "step", delta * 0.1);
+            bb.Set( Id, "step", delta * 0.2);
         }
 
         protected override void OnClose(Blackboard bb)

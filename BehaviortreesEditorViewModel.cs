@@ -15,6 +15,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using Microsoft.Win32;
+using System.Windows;
 
 namespace Prototype
 {
@@ -64,6 +65,10 @@ namespace Prototype
             sfDialog.FileName = "untitled";
             sfDialog.Filter = "Behaviors (*.behaviors)|All(*.*)";
 
+            New = new RelayCommand(arg => {
+                Model.Units.Clear();
+                Model.Behaviortrees.Clear();
+            });
             Load = new RelayCommand(arg => {
                 if (ofDialog.ShowDialog().Value)
                 {
@@ -71,6 +76,9 @@ namespace Prototype
                 }
             });
             Save = new RelayCommand(arg => {
+                save(sfDialog.FileName);
+            });
+            SaveAs = new RelayCommand(arg => {
                 if (sfDialog.ShowDialog().Value)
                 {
                     save(sfDialog.FileName);
@@ -105,8 +113,7 @@ namespace Prototype
                     var unit = new Unit();
                     unit.Behavior = Model.FindBehaviortreeByName(n.GetAttribute("behavior"));
                     unit.World = Model;
-                    unit.Position.X = double.Parse(n.GetAttribute("x"));
-                    unit.Position.Y = double.Parse(n.GetAttribute("y"));
+                    unit.Position = new Vector(double.Parse(n.GetAttribute("x")), double.Parse(n.GetAttribute("y")));
                     unit.Type = (UnitTypes) Enum.Parse(typeof(UnitTypes), n.GetAttribute("type"));
                     Model.Units.Add(unit);
                 }
@@ -178,7 +185,8 @@ namespace Prototype
                     un.SetAttribute("type", unit.Type.ToString());
                     un.SetAttribute("x", unit.Position.X.ToString());
                     un.SetAttribute("y", unit.Position.Y.ToString());
-                    un.SetAttribute("behavior", unit.Behavior.Name);
+                    if (unit.Behavior!=null)
+                        un.SetAttribute("behavior", unit.Behavior.Name);
                 }
 
                 doc.Save(filename);
@@ -210,8 +218,10 @@ namespace Prototype
 
         public ICommand AddBehaviortree { get; private set; }
         public ICommand RemoveBehaviortree { get; private set; }
+        public ICommand New { get; private set; }
         public ICommand Load { get; private set; }
         public ICommand Save { get; private set; }
+        public ICommand SaveAs { get; private set; }
 
         private void OnTimerTick(object sender, EventArgs e)
         {

@@ -1,6 +1,6 @@
 ﻿namespace Prototype.Behaviortree
 {
-    [Node]
+    [Node(Path = "Basic/Failer")]
     public class Failer : Node
     {
         protected override Status OnExecute(Blackboard bb)

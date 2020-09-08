@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Prototype
 {
-    public class ViewModel : INotifyPropertyChanged
+    public class Notifier : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -13,7 +13,7 @@ namespace Prototype
         }
     }
 
-    public class ViewModelBase<T> : ViewModel
+    public class ViewModelBase<T> : Notifier
     {
         public T Model { get; set; }
     }

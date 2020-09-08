@@ -67,6 +67,7 @@
     <Compile Include="Behaviortree\Failer.cs" />
     <Compile Include="Behaviortree\Succeeder.cs" />
     <Compile Include="BlackboardViewModel.cs" />
+    <Compile Include="Converter.cs" />
     <Compile Include="EnumBooleanConverter.cs" />
     <Compile Include="InputBehaviortreeNodes.cs" />
     <Compile Include="NodeFactory.cs" />
@@ -167,6 +168,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\pause.png" />
+    <Resource Include="Images\play.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

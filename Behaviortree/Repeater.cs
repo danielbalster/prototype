@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Prototype.Behaviortree
 {
-    [Node]
+    [Node(Path = "Basic/Repeater")]
     public class Repeater : Decorator
     {
         [Property]

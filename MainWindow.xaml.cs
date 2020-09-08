@@ -87,20 +87,15 @@ namespace Prototype
 
             //World.TargetPosition = new Vector(rayResult.PointHit.X, rayResult.PointHit.Z);
 
-            
-
             var unit = new Unit { World = World.Model };
             unit.Position = new Vector(rayResult.PointHit.X, rayResult.PointHit.Z); ;
             unit.Selected = false;
-            unit.Type = UnitTypes.Leader;
-            unit.Behavior = null;
+            unit.Type = UnitsEditor.UnitType;
+            unit.Behavior = BehaviortreesEditor.Current?.Model;
 
             World.Model.PendingActions.Add((world) => {
                 world.Units.Add(unit);
-
             });
-
-            
 
             return HitTestResultBehavior.Stop;
         }
@@ -163,12 +158,10 @@ namespace Prototype
 
         private void SetupRender()
         {
-            materials[UnitTypes.Animal] = new DiffuseMaterial { Brush = Brushes.Gray };
-            materials[UnitTypes.Builder] = new DiffuseMaterial { Brush = Brushes.Green };
-            materials[UnitTypes.Carrier] = new DiffuseMaterial { Brush = Brushes.Blue };
-            materials[UnitTypes.Leader] = new DiffuseMaterial { Brush = Brushes.Red };
-            materials[UnitTypes.Military] = new DiffuseMaterial { Brush = Brushes.Yellow };
-            materials[UnitTypes.Worker] = new DiffuseMaterial { Brush = Brushes.Magenta };
+            materials[UnitTypes.Green] = new DiffuseMaterial { Brush = Brushes.Green };
+            materials[UnitTypes.Blue] = new DiffuseMaterial { Brush = Brushes.Blue };
+            materials[UnitTypes.Red] = new DiffuseMaterial { Brush = Brushes.Red };
+            materials[UnitTypes.Yellow] = new DiffuseMaterial { Brush = Brushes.Yellow };
 
             planeOdd = new GeometryModel3D();
             planeOdd.Geometry = MeshFactory.CreateCheckerboard(5, 500, 0);
@@ -218,7 +211,7 @@ namespace Prototype
             World.HighlightedUnits.Clear();
             foreach (var uvm in UnitsEditor.Units)
             {
-                uvm.ModelVisual3D.Transform = new TranslateTransform3D(uvm.X, 0, uvm.Y);
+                uvm.ModelVisual3D.Transform = new TranslateTransform3D(uvm.Position.X, 0, uvm.Position.Y);
                 Models.Children.Add(uvm.ModelVisual3D);
 
                 var selected = false;

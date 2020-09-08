@@ -13,6 +13,8 @@ namespace Prototype
         {
         }
 
+        
+
         public RelayCommand(Action<object> execute, Predicate<object> canExecute)
         {
             this.execute = execute;
@@ -28,12 +30,13 @@ namespace Prototype
         {
             execute(parameter);
         }
-
+        
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
+        
 
     }
 }

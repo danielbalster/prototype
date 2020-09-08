@@ -8,7 +8,7 @@ namespace Prototype.Behaviortree
 {
     // success = any has succeeded
 
-    [Node]
+    [Node(Path = "Selector")]
     public class Selector : Composite
     {
         protected override void OnOpen(Blackboard bb)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Prototype.Behaviortree
 {
-    [Node]
+    [Node(Path = "Inverter")]
     sealed public class Inverter : Decorator
     {
         protected override Status OnExecute(Blackboard bb)

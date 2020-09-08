@@ -15,13 +15,20 @@ namespace Prototype
         public UnitViewModel(Unit model)
         {
             Model = model;
+            Model.PropertyChanged += Model_PropertyChanged;
 
             modelVisual3D.Model = geometryModel3D;
             modelVisual3D.MouseDown += OnMouseDown;
             modelVisual3D.MouseUp += OnMouseUp;
             geometryModel3D.Geometry = Helper.FindResource("cubeMesh") as Geometry3D;
-            behaviortree = new BehaviortreeViewModel(Model.Behavior);
+            if (Model.Behavior!=null)
+                behaviortree = new BehaviortreeViewModel(Model.Behavior);
             blackboard = new BlackboardViewModel(Model.Blackboard);
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            this.RaisePropertyChanged(e.PropertyName);
         }
 
         #region Blackboard
@@ -42,6 +49,15 @@ namespace Prototype
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
+            //if (Keyboard.IsKeyDown(Key.LeftShift))
+        }
+
+        internal void Sync()
+        {
+            if (Behaviortree == null || (Behaviortree.Model!=null && !Behaviortree.Model.Equals(Model.Behavior)))
+            {
+                Behaviortree = new BehaviortreeViewModel(Model.Behavior);
+            }
         }
 
         private void OnMouseUp(object sender, MouseButtonEventArgs e)
@@ -54,6 +70,17 @@ namespace Prototype
                     world.Units.Remove(Model);
                     Model.Dispose();
                 });
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                foreach (var unit in Model.World.Units)
+                {
+                    unit.Selected = unit.GroupId == GroupId;
+                }
+            }
+            else
+            {
+                Selected = !Selected;
             }
         }
 
@@ -113,6 +140,22 @@ namespace Prototype
             }
         }
 
+        public Guid GroupId
+        {
+            get
+            {
+                return Model.GroupId;
+            }
+            set
+            {
+                if (Model.GroupId != value)
+                {
+                    Model.GroupId = value;
+                    RaisePropertyChanged("GroupId");
+                }
+            }
+        }
+
         public Guid Id
         {
             get => Model.Id;
@@ -128,7 +171,7 @@ namespace Prototype
             }
             set
             {
-                if (!Model.Behavior.Equals(behaviortree.Model))
+                if (Model.Behavior == null || behaviortree==null || !Model.Behavior.Equals(behaviortree.Model))
                 {
                     behaviortree = value;
                     Model.Behavior = behaviortree.Model;
@@ -137,40 +180,7 @@ namespace Prototype
             }
         }
         #endregion
-        #region X
-        public double X
-        {
-            get
-            {
-                return Model.Position.X;
-            }
-            set
-            {
-                if (Model.Position.X != value)
-                {
-                    Model.Position.X = value;
-                    RaisePropertyChanged("X");
-                }
-            }
-        }
-        #endregion
-        #region Y
-        public double Y
-        {
-            get
-            {
-                return Model.Position.Y;
-            }
-            set
-            {
-                if (Model.Position.Y != value)
-                {
-                    Model.Position.Y = value;
-                    RaisePropertyChanged("Y");
-                }
-            }
-        }
-        #endregion
+
         #region Position
         public Vector Position
         {

@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Prototype
 {
-    [Node]
+    [Node(Path = "Variables/ChangeVariable")]
     public class ChangeVariable : Node
     {
         [Property]
@@ -58,7 +58,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Variables/CompareVariable")]
     public class CompareVariable : Node
     {
         [Property]
@@ -67,7 +67,7 @@ namespace Prototype
         public string Value { set; get; }
         protected override Status OnExecute(Blackboard bb)
         {
-            if (!bb.Get<string>(Guid.Empty, Key, out string value)) return Status.Error;
+            if (!bb.Get<string>(Guid.Empty, Key, out string value)) return Status.Failure;
             if (value == Value) return Status.Success;
             return Status.Failure;
         }
@@ -173,7 +173,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/AreButtonsHeld")]
     public class AreButtonsHeld : ControllerNode
     {
         protected override Status OnExecute(Blackboard bb)
@@ -195,7 +195,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/HaveButtonsChanged")]
     public class HaveButtonsChanged : ControllerNode
     {
         protected override Status OnExecute(Blackboard bb)
@@ -221,7 +221,7 @@ namespace Prototype
 
 
 
-    [Node]
+    [Node(Path = "Input/HasSelection")]
     public class HasSelection : Node
     {
         protected override Status OnExecute(Blackboard bb)
@@ -237,7 +237,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/SelectUnits")]
     public class SelectUnits : Node
     {
         protected override Status OnExecute(Blackboard bb)
@@ -260,7 +260,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/UnselectUnits")]
     public class UnselectUnits : Node
     {
         protected override Status OnExecute(Blackboard bb)
@@ -283,7 +283,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    //[Node(Path = "Selection/RemoveSelected")]
     class RemoveSelected : Node
     {
 
@@ -291,7 +291,7 @@ namespace Prototype
 
 
 
-    [Node]
+    [Node(Path = "Input/TestSelectionMode")]
     public class TestSelectionMode : Node
     {
         [Property]
@@ -328,7 +328,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/SetSelectionMode")]
     public class SetSelectionMode : Node
     {
         [Property]
@@ -364,7 +364,7 @@ namespace Prototype
     }
 
 
-    [Node]
+    [Node(Path = "Input/ShowTargetCursor")]
     public class ShowTargetCursor : Node
     {
         [Property]
@@ -399,7 +399,7 @@ namespace Prototype
         }
     }
 
-    [Node]
+    [Node(Path = "Input/SetTargetHere")]
     public class SetTargetHere : Node
     {
         protected override Status OnExecute(Blackboard bb)
@@ -419,7 +419,45 @@ namespace Prototype
     }
 
 
-    [Node]
+    [Node(Path = "Input/OrderTarget")]
+    public class OrderTarget : Node
+    {
+        [Property]
+        public bool Immediate { set; get; }
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+            foreach (var unit in world.GetSelectedUnits())
+            {
+                unit.Blackboard.Model.Set(Guid.Empty, "target", world.TargetPosition);
+            }
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(OrderTarget))]
+    public class OrderTargetViewModel : NodeViewModelBase<OrderTarget>
+    {
+        #region Immediate
+        public bool Immediate
+        {
+            get => Model.Immediate;
+            set
+            {
+                if (Model.Immediate != value)
+                {
+                    Model.Immediate = value;
+                    RaisePropertyChanged("Immediate");
+                }
+            }
+        }
+        #endregion
+        public OrderTargetViewModel(OrderTarget model) : base(model)
+        {
+        }
+    }
+
+
+    [Node(Path = "Basic/SetBehavior")]
     public class SetBehavior : Node
     {
         [Property]
@@ -461,6 +499,71 @@ namespace Prototype
         }
     }
 
+    [Node(Path = "Input/Group")]
+    public class Group : Node
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
 
+            var set = world.GetSelectedGroupId();
+
+            // at least some units had a group id
+            Guid guid = Guid.NewGuid();
+            if (set.Count==1) guid = set.First();
+            foreach (var unit in world.Units)
+            {
+                if (unit.Selected) unit.GroupId = guid;
+            }
+
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(Group))]
+    public class GroupViewModel : NodeViewModelBase<Group>
+    {
+        public GroupViewModel(Group model) : base(model) {}
+    }
+
+    [Node(Path = "Input/Ungroup")]
+    public class Ungroup : Node
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+
+            foreach (var unit in world.Units)
+            {
+                if (unit.Selected) unit.GroupId = Guid.Empty;
+            }
+
+            return Status.Success;
+        }
+    }
+    [Model(Type = typeof(Ungroup))]
+    public class UngroupViewModel : NodeViewModelBase<Ungroup>
+    {
+        public UngroupViewModel(Ungroup model) : base(model) { }
+    }
+
+    [Node(Path = "Input/IsGroup")]
+    public class IsGroup : Node
+    {
+        protected override Status OnExecute(Blackboard bb)
+        {
+            if (!bb.Get(Guid.Empty, "world", out WorldViewModel world)) return Status.Error;
+
+            var set = world.GetSelectedGroupId();
+
+            if (set.Count > 0) return Status.Success;
+
+            return Status.Failure;
+        }
+    }
+    [Model(Type = typeof(IsGroup))]
+    public class IsGroupViewModel : NodeViewModelBase<IsGroup>
+    {
+        public IsGroupViewModel(IsGroup model) : base(model) { }
+    }
 
 }
